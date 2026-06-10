@@ -3,110 +3,142 @@
 namespace App\Http\Controllers;
 
 use App\Models\Libro;
+use App\Models\Autor;
 use App\DataStructures\ListaEnlazada;
 use App\DataStructures\Pila;
 use App\DataStructures\Cola;
-use App\DataStructures\ArbolBST;
-use App\DataStructures\ArbolAVL;
+use App\DataStructures\ArbolBinario;
+use App\DataStructures\Grafo;
 
 class EstructuraController extends Controller
 {
-    // Lista Enlazada - Lista de libros disponibles
     public function listaEnlazada()
     {
         $lista = new ListaEnlazada();
         $libros = Libro::with(['autor', 'categoria'])->get();
 
-        foreach ($libros as $libro) {
+        $i = 0;
+        while ($i < count($libros)) {
             $lista->insertar([
-                'id'        => $libro->id,
-                'titulo'    => $libro->titulo,
-                'autor'     => $libro->autor->nombre,
-                'categoria' => $libro->categoria->nombre,
-                'portada'   => $libro->portada,
+                'id'        => $libros[$i]->id,
+                'titulo'    => $libros[$i]->titulo,
+                'autor'     => $libros[$i]->autor->nombre,
+                'categoria' => $libros[$i]->categoria->nombre,
+                'portada'   => $libros[$i]->portada,
             ]);
+            $i++;
         }
 
         $elementos = $lista->recorrer();
         return view('estructuras.lista-enlazada', compact('elementos'));
     }
 
-    // Pila - Historial de libros visitados
     public function pila()
     {
         $pila = new Pila();
         $libros = Libro::with('autor')->latest()->take(8)->get();
 
-        foreach ($libros as $libro) {
+        $i = 0;
+        while ($i < count($libros)) {
             $pila->push([
-                'id'     => $libro->id,
-                'titulo' => $libro->titulo,
-                'autor'  => $libro->autor->nombre,
-                'portada' => $libro->portada,
+                'id'      => $libros[$i]->id,
+                'titulo'  => $libros[$i]->titulo,
+                'autor'   => $libros[$i]->autor->nombre,
+                'portada' => $libros[$i]->portada,
             ]);
+            $i++;
         }
 
         $elementos = $pila->recorrer();
         return view('estructuras.pila', compact('elementos'));
     }
 
-    // Cola - Cola de solicitudes de libros
     public function cola()
     {
         $cola = new Cola();
         $libros = Libro::with('autor')->get();
 
-        foreach ($libros as $libro) {
+        $i = 0;
+        while ($i < count($libros)) {
             $cola->encolar([
-                'id'     => $libro->id,
-                'titulo' => $libro->titulo,
-                'autor'  => $libro->autor->nombre,
-                'portada' => $libro->portada,
+                'id'      => $libros[$i]->id,
+                'titulo'  => $libros[$i]->titulo,
+                'autor'   => $libros[$i]->autor->nombre,
+                'portada' => $libros[$i]->portada,
             ]);
+            $i++;
         }
 
         $elementos = $cola->recorrer();
         return view('estructuras.cola', compact('elementos'));
     }
 
-    // Arbol BST - Busqueda de libros por titulo
-    public function arbolBST()
+    public function arbolBinario()
     {
-        $arbol = new ArbolBST();
+        $arbol = new ArbolBinario();
         $libros = Libro::with('autor')->get();
 
-        foreach ($libros as $libro) {
+        $i = 0;
+        while ($i < count($libros)) {
             $arbol->insertar([
-                'id'      => $libro->id,
-                'titulo'  => $libro->titulo,
-                'autor'   => $libro->autor->nombre,
-                'portada' => $libro->portada,
+                'id'      => $libros[$i]->id,
+                'titulo'  => $libros[$i]->titulo,
+                'autor'   => $libros[$i]->autor->nombre,
+                'portada' => $libros[$i]->portada,
             ]);
+            $i++;
         }
 
         $inorden   = $arbol->inorden();
         $preorden  = $arbol->preorden();
         $postorden = $arbol->postorden();
 
-        return view('estructuras.arbol-bst', compact('inorden', 'preorden', 'postorden'));
+        return view('estructuras.arbol-binario', compact('inorden', 'preorden', 'postorden'));
     }
 
-    // Arbol AVL - Busqueda de libros por autor
-    public function arbolAVL()
+    public function grafo()
     {
-        $arbol = new ArbolAVL();
-        $libros = Libro::with('autor')->get();
+        $grafo = new Grafo();
+        $autores = Autor::with(['libros.categoria'])->get();
 
-        foreach ($libros as $libro) {
-            $arbol->insertar([
-                'id'      => $libro->id,
-                'titulo'  => $libro->titulo,
-                'autor'   => $libro->autor->nombre,
-                'portada' => $libro->portada,
-            ]);
+        // Agregar cada autor como vertice
+        $i = 0;
+        while ($i < count($autores)) {
+            $grafo->agregarVertice($autores[$i]->nombre);
+            $i++;
         }
 
-        $elementos = $arbol->inorden();
-        return view('estructuras.arbol-avl', compact('elementos'));
+        // Conectar autores que comparten la misma categoria
+        $i = 0;
+        while ($i < count($autores)) {
+            $j = $i + 1;
+            while ($j < count($autores)) {
+                $categoriasA = $autores[$i]->libros->pluck('categoria.nombre')->unique()->toArray();
+                $categoriasB = $autores[$j]->libros->pluck('categoria.nombre')->unique()->toArray();
+
+                $k = 0;
+                while ($k < count($categoriasA)) {
+                    $l = 0;
+                    while ($l < count($categoriasB)) {
+                        if ($categoriasA[$k] === $categoriasB[$l]) {
+                            $grafo->agregarArista(
+                                $autores[$i]->nombre,
+                                $autores[$j]->nombre,
+                                $categoriasA[$k]
+                            );
+                        }
+                        $l++;
+                    }
+                    $k++;
+                }
+                $j++;
+            }
+            $i++;
+        }
+
+        $vertices = $grafo->obtenerVertices();
+        $aristas  = $grafo->obtenerAristas();
+
+        return view('estructuras.grafo', compact('vertices', 'aristas'));
     }
 }

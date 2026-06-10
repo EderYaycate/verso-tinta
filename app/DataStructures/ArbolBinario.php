@@ -2,7 +2,7 @@
 
 namespace App\DataStructures;
 
-class NodoBST
+class NodoArbol
 {
     public $dato;
     public $izquierdo;
@@ -16,7 +16,7 @@ class NodoBST
     }
 }
 
-class ArbolBST
+class ArbolBinario
 {
     private $raiz;
 
@@ -25,7 +25,6 @@ class ArbolBST
         $this->raiz = null;
     }
 
-    // Insertar un libro por titulo
     public function insertar($dato)
     {
         $this->raiz = $this->insertarNodo($this->raiz, $dato);
@@ -34,7 +33,7 @@ class ArbolBST
     private function insertarNodo($nodo, $dato)
     {
         if ($nodo === null) {
-            return new NodoBST($dato);
+            return new NodoArbol($dato);
         }
 
         if ($dato['titulo'] < $nodo->dato['titulo']) {
@@ -46,7 +45,6 @@ class ArbolBST
         return $nodo;
     }
 
-    // Buscar por titulo
     public function buscar($titulo)
     {
         return $this->buscarNodo($this->raiz, $titulo);
@@ -56,9 +54,7 @@ class ArbolBST
     {
         if ($nodo === null) return null;
 
-        if ($titulo === $nodo->dato['titulo']) {
-            return $nodo->dato;
-        }
+        if ($titulo === $nodo->dato['titulo']) return $nodo->dato;
 
         if ($titulo < $nodo->dato['titulo']) {
             return $this->buscarNodo($nodo->izquierdo, $titulo);
@@ -67,7 +63,6 @@ class ArbolBST
         return $this->buscarNodo($nodo->derecho, $titulo);
     }
 
-    // Eliminar por titulo
     public function eliminar($titulo)
     {
         $this->raiz = $this->eliminarNodo($this->raiz, $titulo);
@@ -101,7 +96,6 @@ class ArbolBST
         return $nodo;
     }
 
-    // Recorrido inorden (devuelve libros ordenados por titulo)
     public function inorden()
     {
         $resultado = [];
@@ -117,7 +111,6 @@ class ArbolBST
         $this->inordenRecursivo($nodo->derecho, $resultado);
     }
 
-    // Recorrido preorden
     public function preorden()
     {
         $resultado = [];
@@ -133,7 +126,6 @@ class ArbolBST
         $this->preordenRecursivo($nodo->derecho, $resultado);
     }
 
-    // Recorrido postorden
     public function postorden()
     {
         $resultado = [];
