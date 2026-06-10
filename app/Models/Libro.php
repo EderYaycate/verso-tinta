@@ -3,7 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+/**
+ * @property string $titulo
+ * @property string $resumen
+ * @property string|null $portada
+ * @property int $autor_id
+ * @property int $categoria_id
+ */
 class Libro extends Model
 {
     protected $table = 'libros';
