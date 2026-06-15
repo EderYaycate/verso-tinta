@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-7">
@@ -13,6 +13,12 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Resumen</label>
                     <textarea name="resumen" rows="4" class="form-control" required>{{ old('resumen', $libro->resumen) }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Precio (S/)</label>
+                    <input type="number" name="precio" value="{{ old('precio', $libro->precio) }}"
+                        class="form-control" step="0.01" min="0" required>
+                    @error('precio')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Portada actual</label>

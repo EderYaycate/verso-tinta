@@ -11,18 +11,21 @@ class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear roles
-        $admin = Role::create(['name' => 'admin']);
+        $admin   = Role::create(['name' => 'admin']);
         $usuario = Role::create(['name' => 'usuario']);
 
-        // Crear usuario administrador
-        $user = User::create([
+        $userAdmin = User::create([
             'name'     => 'Administrador',
             'email'    => 'admin@libreria.com',
             'password' => Hash::make('admin123'),
         ]);
+        $userAdmin->assignRole($admin);
 
-        // Asignar rol admin
-        $user->assignRole($admin);
+        $userCliente = User::create([
+            'name'     => 'Cliente',
+            'email'    => 'cliente@libreria.com',
+            'password' => Hash::make('cliente123'),
+        ]);
+        $userCliente->assignRole($usuario);
     }
 }

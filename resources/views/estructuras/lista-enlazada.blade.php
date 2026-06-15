@@ -1,7 +1,5 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 @section('content')
-<h2 class="page-title mb-4">Lista Enlazada - Libros disponibles</h2>
-<p class="text-muted mb-4">Estructura que recorre todos los libros nodo por nodo.</p>
 
 <div class="card-custom overflow-hidden">
     <table class="table table-hover mb-0">

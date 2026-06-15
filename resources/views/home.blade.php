@@ -26,54 +26,81 @@
         .card-libro .placeholder-img { width: 100%; height: 200px; background: linear-gradient(135deg, var(--vino-dark), var(--vino)); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
         .badge-categoria { background-color: var(--vino); color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
         .feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .btn-carrito-nav { position: relative; color: #fff; font-size: 1.3rem; text-decoration: none; padding: 4px 10px; }
+        .btn-carrito-nav:hover { color: #c9a87c; }
         footer { background-color: var(--vino-dark); color: #c9a87c; padding: 30px 0; margin-top: 60px; }
     </style>
 </head>
 <body>
-
-{{-- NAVBAR --}}
 <nav class="navbar navbar-expand-sm navbar-home py-2">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
-            <span style="font-size:1.5rem"></span>
             <div>
                 <span style="display:block;font-size:1rem;font-weight:800;color:#fff;font-family:Georgia,serif;line-height:1">VERSO & TINTA</span>
                 <span style="display:block;font-size:0.6rem;color:#c9a87c;letter-spacing:2px">LIBRERÍA LITERARIA</span>
             </div>
         </a>
-        <div class="ms-auto d-flex gap-2">
-            <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light px-3">Iniciar Sesión</a>
-            <a href="{{ route('register') }}" class="btn btn-sm btn-vino px-3">Registrarse</a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            @auth
+                @if(auth()->user()->hasRole('usuario'))
+                    <a href="{{ route('carrito.index') }}" class="btn-carrito-nav">
+                        🛒
+                        @php $cant = \App\Models\Carrito::where('user_id', auth()->id())->sum('cantidad'); @endphp
+                        @if($cant > 0)
+                            <span style="position:absolute;top:0;right:0;background:#e74c3c;color:#fff;border-radius:50%;width:16px;height:16px;font-size:0.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;">{{ $cant }}</span>
+                        @endif
+                    </a>
+                @elseif(auth()->user()->hasRole('admin'))
+                    <a href="{{ route('admin.pedidos') }}" class="btn btn-sm btn-outline-light px-3">
+                        📦 Pedidos pendientes
+                    </a>
+                @endif
+                <form action="{{ route('logout') }}" method="POST" class="mb-0">
+                    @csrf
+                    <button class="btn btn-sm btn-outline-light px-3">Salir</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}?redirect={{ urlencode(route('carrito.index')) }}"
+                   class="btn-carrito-nav" title="Inicia sesión para ver tu carrito">🛒</a>
+                <a href="{{ route('login') }}" class="btn btn-sm btn-outline-light px-3">Iniciar Sesión</a>
+                <a href="{{ route('register') }}" class="btn btn-sm btn-vino px-3">Registrarse</a>
+            @endauth
         </div>
     </div>
 </nav>
 
-{{-- HERO --}}
 <section class="hero text-center">
     <div class="container">
         <h1>Verso & Tinta</h1>
         <p class="mb-4">Tu librería literaria — descubre, explora y gestiona el mundo de los libros</p>
-        <a href="{{ route('login') }}" class="btn btn-vino me-2">Entrar al sistema</a>
+        @auth
+            @if(auth()->user()->hasRole('admin'))
+                <a href="{{ route('libros.index') }}" class="btn btn-vino me-2">Panel Admin</a>
+            @else
+                <a href="{{ route('usuario.lista') }}" class="btn btn-vino me-2">Ver Catálogo</a>
+            @endif
+        @else
+            <a href="{{ route('login') }}" class="btn btn-vino me-2">Entrar al sistema</a>
+        @endauth
         <a href="{{ route('catalogo') }}" class="btn btn-outline-light">Ver catálogo</a>
     </div>
 </section>
 
-{{-- FEATURES --}}
 <section class="py-5">
     <div class="container">
         <div class="row g-4 text-center">
             <div class="col-md-4">
-                <div class="feature-icon"></div>
+                <div class="feature-icon">📚</div>
                 <h5 style="color:var(--vino-dark);font-weight:700">Gestión de Libros</h5>
                 <p class="text-muted">Registra y administra tu colección completa con portadas, resúmenes y autores.</p>
             </div>
             <div class="col-md-4">
-                <div class="feature-icon"></div>
+                <div class="feature-icon">✍️</div>
                 <h5 style="color:var(--vino-dark);font-weight:700">Autores</h5>
                 <p class="text-muted">Mantén un registro detallado de todos los autores y su bibliografía.</p>
             </div>
             <div class="col-md-4">
-                <div class="feature-icon"></div>
+                <div class="feature-icon">🏷️</div>
                 <h5 style="color:var(--vino-dark);font-weight:700">Categorías</h5>
                 <p class="text-muted">Organiza los libros por géneros y categorías para una búsqueda más fácil.</p>
             </div>
@@ -81,7 +108,6 @@
     </div>
 </section>
 
-{{-- CATÁLOGO PÚBLICO --}}
 <section class="py-5" id="catalogo" style="background:#fff">
     <div class="container">
         <h2 class="section-title mb-4">Catálogo de Libros</h2>
@@ -98,7 +124,8 @@
                         <span class="badge-categoria mb-2 d-inline-block">{{ $libro->categoria->nombre }}</span>
                         <h6 class="fw-bold mb-1">{{ $libro->titulo }}</h6>
                         <p class="small mb-1" style="color:var(--vino)">{{ $libro->autor->nombre }}</p>
-                        <p class="text-muted small">{{ Str::limit($libro->resumen, 80) }}</p>
+                        <p class="text-muted small mb-2">{{ Str::limit($libro->resumen, 80) }}</p>
+                        <p class="fw-bold mb-0" style="color:var(--vino)">S/ {{ number_format($libro->precio, 2) }}</p>
                     </div>
                 </div>
             </div>
@@ -112,7 +139,6 @@
     </div>
 </section>
 
-{{-- FOOTER --}}
 <footer class="text-center">
     <p class="mb-1" style="font-family:Georgia,serif;font-size:1.1rem">Verso & Tinta</p>
     <small>© {{ date('Y') }} — Todos los derechos reservados</small>

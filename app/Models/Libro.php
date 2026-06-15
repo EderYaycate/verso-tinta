@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 /**
+ * @property int $id
  * @property string $titulo
  * @property string $resumen
- * @property string|null $portada
+ * @property string $portada
+ * @property float $precio
  * @property int $autor_id
  * @property int $categoria_id
  */
 class Libro extends Model
 {
-    protected $table = 'libros';
-    protected $fillable = ['titulo', 'resumen', 'portada', 'autor_id', 'categoria_id'];
+    protected $fillable = ['titulo', 'resumen', 'portada', 'precio', 'autor_id', 'categoria_id'];
 
     public function autor()
     {
@@ -23,5 +25,10 @@ class Libro extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    public function carritoItems()
+    {
+        return $this->hasMany(Carrito::class);
     }
 }

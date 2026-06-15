@@ -28,12 +28,13 @@ class LibroController extends Controller
         $request->validate([
             'titulo'       => 'required|string|max:255',
             'resumen'      => 'required|string',
+            'precio'       => 'required|numeric|min:0',
             'portada'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'autor_id'     => 'required|exists:autores,id',
             'categoria_id' => 'required|exists:categorias,id',
         ]);
 
-        $data = $request->only(['titulo', 'resumen', 'autor_id', 'categoria_id']);
+        $data = $request->only(['titulo', 'resumen', 'precio', 'autor_id', 'categoria_id']);
 
         if ($request->hasFile('portada')) {
             $data['portada'] = $request->file('portada')->store('portadas', 'public');
@@ -61,12 +62,13 @@ class LibroController extends Controller
         $request->validate([
             'titulo'       => 'required|string|max:255',
             'resumen'      => 'required|string',
+            'precio'       => 'required|numeric|min:0',
             'portada'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'autor_id'     => 'required|exists:autores,id',
             'categoria_id' => 'required|exists:categorias,id',
         ]);
 
-        $data = $request->only(['titulo', 'resumen', 'autor_id', 'categoria_id']);
+        $data = $request->only(['titulo', 'resumen', 'precio', 'autor_id', 'categoria_id']);
 
         if ($request->hasFile('portada')) {
             if ($libro->portada) {

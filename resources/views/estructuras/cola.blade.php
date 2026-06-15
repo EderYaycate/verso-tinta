@@ -1,9 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="page-title mb-0">Cola - Solicitudes de Libros</h2>
-</div>
-<p class="text-muted mb-4">Estructura FIFO - El primer libro agregado es el primero en atenderse.</p>
+   
 
 <div class="card-custom overflow-hidden">
     <table class="table table-hover mb-0">
