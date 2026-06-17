@@ -25,7 +25,7 @@ class AutorController extends Controller
             'nacionalidad' => 'required|string|max:255',
         ]);
 
-        Autor::create($request->all());
+        Autor::create($request->only(['nombre', 'nacionalidad']));
         return redirect()->route('autores.index')
                          ->with('success', 'Autor creado correctamente.');
     }
@@ -48,13 +48,18 @@ class AutorController extends Controller
             'nacionalidad' => 'required|string|max:255',
         ]);
 
-        $autor->update($request->all());
+        $autor->update($request->only(['nombre', 'nacionalidad']));
         return redirect()->route('autores.index')
                          ->with('success', 'Autor actualizado correctamente.');
     }
 
     public function destroy(Autor $autor)
     {
+        if ($autor->libros()->count() > 0) {
+            return redirect()->route('autores.index')
+                ->with('error', 'No se puede eliminar el autor porque tiene libros asociados.');
+        }
+
         $autor->delete();
         return redirect()->route('autores.index')
                          ->with('success', 'Autor eliminado correctamente.');

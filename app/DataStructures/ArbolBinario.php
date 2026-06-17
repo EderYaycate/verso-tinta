@@ -52,9 +52,13 @@ class ArbolBinario
 
     private function buscarNodo($nodo, $titulo)
     {
-        if ($nodo === null) return null;
+        if ($nodo === null) {
+            return null;
+        }
 
-        if ($titulo === $nodo->dato['titulo']) return $nodo->dato;
+        if ($titulo === $nodo->dato['titulo']) {
+            return $nodo->dato;
+        }
 
         if ($titulo < $nodo->dato['titulo']) {
             return $this->buscarNodo($nodo->izquierdo, $titulo);
@@ -70,15 +74,21 @@ class ArbolBinario
 
     private function eliminarNodo($nodo, $titulo)
     {
-        if ($nodo === null) return null;
+        if ($nodo === null) {
+            return null;
+        }
 
         if ($titulo < $nodo->dato['titulo']) {
             $nodo->izquierdo = $this->eliminarNodo($nodo->izquierdo, $titulo);
         } elseif ($titulo > $nodo->dato['titulo']) {
             $nodo->derecho = $this->eliminarNodo($nodo->derecho, $titulo);
         } else {
-            if ($nodo->izquierdo === null) return $nodo->derecho;
-            if ($nodo->derecho === null) return $nodo->izquierdo;
+            if ($nodo->izquierdo === null) {
+                return $nodo->derecho;
+            }
+            if ($nodo->derecho === null) {
+                return $nodo->izquierdo;
+            }
 
             $minimo = $this->minimoNodo($nodo->derecho);
             $nodo->dato = $minimo->dato;
@@ -90,10 +100,10 @@ class ArbolBinario
 
     private function minimoNodo($nodo)
     {
-        while ($nodo->izquierdo !== null) {
-            $nodo = $nodo->izquierdo;
+        if ($nodo->izquierdo === null) {
+            return $nodo;
         }
-        return $nodo;
+        return $this->minimoNodo($nodo->izquierdo);
     }
 
     public function inorden()
@@ -105,7 +115,9 @@ class ArbolBinario
 
     private function inordenRecursivo($nodo, &$resultado)
     {
-        if ($nodo === null) return;
+        if ($nodo === null) {
+            return;
+        }
         $this->inordenRecursivo($nodo->izquierdo, $resultado);
         $resultado[] = $nodo->dato;
         $this->inordenRecursivo($nodo->derecho, $resultado);
@@ -120,7 +132,9 @@ class ArbolBinario
 
     private function preordenRecursivo($nodo, &$resultado)
     {
-        if ($nodo === null) return;
+        if ($nodo === null) {
+            return;
+        }
         $resultado[] = $nodo->dato;
         $this->preordenRecursivo($nodo->izquierdo, $resultado);
         $this->preordenRecursivo($nodo->derecho, $resultado);
@@ -135,7 +149,9 @@ class ArbolBinario
 
     private function postordenRecursivo($nodo, &$resultado)
     {
-        if ($nodo === null) return;
+        if ($nodo === null) {
+            return;
+        }
         $this->postordenRecursivo($nodo->izquierdo, $resultado);
         $this->postordenRecursivo($nodo->derecho, $resultado);
         $resultado[] = $nodo->dato;

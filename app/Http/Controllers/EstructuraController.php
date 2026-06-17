@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Libro;
 use App\Models\Autor;
 use App\Models\Categoria;
+use App\Models\Pedido;
 use App\DataStructures\ListaEnlazada;
 use App\DataStructures\Pila;
 use App\DataStructures\Cola;
@@ -99,46 +100,63 @@ class EstructuraController extends Controller
 
     public function grafo()
     {
-        $grafo = new Grafo();
+        $grafo   = new Grafo();
         $autores = Autor::with(['libros.categoria'])->get();
-
-        $i = 0;
-        while ($i < count($autores)) {
-            $grafo->agregarVertice($autores[$i]->nombre);
-            $i++;
-        }
-
-        $i = 0;
-        while ($i < count($autores)) {
-            $j = $i + 1;
-            while ($j < count($autores)) {
-                $categoriasA = $autores[$i]->libros->pluck('categoria.nombre')->unique()->toArray();
-                $categoriasB = $autores[$j]->libros->pluck('categoria.nombre')->unique()->toArray();
-
-                $k = 0;
-                while ($k < count($categoriasA)) {
-                    $l = 0;
-                    while ($l < count($categoriasB)) {
-                        if ($categoriasA[$k] === $categoriasB[$l]) {
-                            $grafo->agregarArista(
-                                $autores[$i]->nombre,
-                                $autores[$j]->nombre,
-                                $categoriasA[$k]
-                            );
-                        }
-                        $l++;
-                    }
-                    $k++;
-                }
-                $j++;
-            }
-            $i++;
-        }
+        $this->construirGrafo($grafo, $autores);
 
         $vertices = array_values($grafo->obtenerVertices());
         $aristas  = $grafo->obtenerAristas();
 
         return view('estructuras.grafo', compact('vertices', 'aristas'));
+    }
+
+    public function historialCompras()
+    {
+        $pila    = new Pila();
+        $pedidos = Pedido::with(['items.libro', 'user'])->latest()->get();
+
+        $porFecha = [];
+        $i = 0;
+        while ($i < count($pedidos)) {
+            $fecha = $pedidos[$i]->created_at->format('d/m/Y');
+            if (!isset($porFecha[$fecha])) {
+                $porFecha[$fecha] = ['total' => 0, 'pedidos' => 0, 'libros' => []];
+            }
+            $porFecha[$fecha]['total']   += $pedidos[$i]->total;
+            $porFecha[$fecha]['pedidos'] += 1;
+
+            $items = $pedidos[$i]->items;
+            $j = 0;
+            while ($j < count($items)) {
+                $titulo = $items[$j]->libro->titulo;
+                if (!isset($porFecha[$fecha]['libros'][$titulo])) {
+                    $porFecha[$fecha]['libros'][$titulo] = 0;
+                }
+                $porFecha[$fecha]['libros'][$titulo] += $items[$j]->cantidad;
+                $j++;
+            }
+            $i++;
+        }
+
+        $fechas = array_keys($porFecha);
+        $k = 0;
+        while ($k < count($fechas)) {
+            $fecha  = $fechas[$k];
+            $datos  = $porFecha[$fecha];
+            arsort($datos['libros']);
+            $masVendido = count($datos['libros']) > 0 ? array_key_first($datos['libros']) : 'Sin datos';
+            $pila->push([
+                'fecha'       => $fecha,
+                'total'       => $datos['total'],
+                'pedidos'     => $datos['pedidos'],
+                'mas_vendido' => $masVendido,
+                'libros'      => $datos['libros'],
+            ]);
+            $k++;
+        }
+
+        $elementos = $pila->recorrer();
+        return view('estructuras.historial-compras', compact('elementos'));
     }
 
     public function listaEnlazadaUsuario()
@@ -156,7 +174,7 @@ class EstructuraController extends Controller
         }
 
         $libros = $query->get();
-        $lista = new ListaEnlazada();
+        $lista  = new ListaEnlazada();
 
         $i = 0;
         while ($i < count($libros)) {
@@ -181,7 +199,7 @@ class EstructuraController extends Controller
 
     public function pilaUsuario()
     {
-        $pila = new Pila();
+        $pila   = new Pila();
         $libros = Libro::with('autor')->latest()->take(8)->get();
 
         $i = 0;
@@ -201,7 +219,7 @@ class EstructuraController extends Controller
 
     public function colaUsuario()
     {
-        $cola = new Cola();
+        $cola   = new Cola();
         $libros = Libro::with('autor')->get();
 
         $i = 0;
@@ -221,7 +239,7 @@ class EstructuraController extends Controller
 
     public function arbolUsuario()
     {
-        $arbol = new ArbolBinario();
+        $arbol  = new ArbolBinario();
         $libros = Libro::with('autor')->get();
 
         $i = 0;
@@ -241,9 +259,18 @@ class EstructuraController extends Controller
 
     public function grafoUsuario()
     {
-        $grafo = new Grafo();
+        $grafo   = new Grafo();
         $autores = Autor::with(['libros.categoria'])->get();
+        $this->construirGrafo($grafo, $autores);
 
+        $vertices = array_values($grafo->obtenerVertices());
+        $aristas  = $grafo->obtenerAristas();
+
+        return view('usuario.grafo', compact('vertices', 'aristas'));
+    }
+
+    private function construirGrafo(Grafo $grafo, $autores)
+    {
         $i = 0;
         while ($i < count($autores)) {
             $grafo->agregarVertice($autores[$i]->nombre);
@@ -252,34 +279,37 @@ class EstructuraController extends Controller
 
         $i = 0;
         while ($i < count($autores)) {
-            $j = $i + 1;
-            while ($j < count($autores)) {
-                $categoriasA = $autores[$i]->libros->pluck('categoria.nombre')->unique()->toArray();
-                $categoriasB = $autores[$j]->libros->pluck('categoria.nombre')->unique()->toArray();
-
-                $k = 0;
-                while ($k < count($categoriasA)) {
-                    $l = 0;
-                    while ($l < count($categoriasB)) {
-                        if ($categoriasA[$k] === $categoriasB[$l]) {
-                            $grafo->agregarArista(
-                                $autores[$i]->nombre,
-                                $autores[$j]->nombre,
-                                $categoriasA[$k]
-                            );
-                        }
-                        $l++;
-                    }
-                    $k++;
-                }
-                $j++;
-            }
+            $categoriasA = $autores[$i]->libros->pluck('categoria.nombre')->unique()->toArray();
+            $this->conectarConSiguientes($grafo, $autores, $categoriasA, $i, $i + 1);
             $i++;
         }
+    }
 
-        $vertices = array_values($grafo->obtenerVertices());
-        $aristas  = $grafo->obtenerAristas();
+    private function conectarConSiguientes(Grafo $grafo, $autores, $categoriasA, $i, $j)
+    {
+        if ($j >= count($autores)) {
+            return;
+        }
 
-        return view('usuario.grafo', compact('vertices', 'aristas'));
+        $categoriasB = $autores[$j]->libros->pluck('categoria.nombre')->unique()->toArray();
+        $this->compararCategorias($grafo, $autores[$i]->nombre, $autores[$j]->nombre, $categoriasA, $categoriasB, 0, 0);
+        $this->conectarConSiguientes($grafo, $autores, $categoriasA, $i, $j + 1);
+    }
+
+    private function compararCategorias(Grafo $grafo, $nombreA, $nombreB, $catA, $catB, $k, $l)
+    {
+        if ($k >= count($catA)) {
+            return;
+        }
+        if ($l >= count($catB)) {
+            $this->compararCategorias($grafo, $nombreA, $nombreB, $catA, $catB, $k + 1, 0);
+            return;
+        }
+
+        if ($catA[$k] === $catB[$l]) {
+            $grafo->agregarArista($nombreA, $nombreB, $catA[$k]);
+        }
+
+        $this->compararCategorias($grafo, $nombreA, $nombreB, $catA, $catB, $k, $l + 1);
     }
 }

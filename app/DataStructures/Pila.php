@@ -25,7 +25,6 @@ class Pila
         $this->tamanio = 0;
     }
 
-    // Insertar elemento en el tope
     public function push($dato)
     {
         $nuevo = new NodoPila($dato);
@@ -34,33 +33,39 @@ class Pila
         $this->tamanio++;
     }
 
-    // Eliminar elemento del tope
     public function pop()
     {
-        if ($this->estaVacia()) return null;
+        if ($this->estaVacia()) {
+            return null;
+        }
         $dato = $this->tope->dato;
         $this->tope = $this->tope->siguiente;
         $this->tamanio--;
         return $dato;
     }
 
-    // Ver el tope sin eliminar
     public function peek()
     {
-        if ($this->estaVacia()) return null;
+        if ($this->estaVacia()) {
+            return null;
+        }
         return $this->tope->dato;
     }
 
-    // Recorrer todos los elementos
     public function recorrer()
     {
         $elementos = [];
-        $actual = $this->tope;
-        while ($actual !== null) {
-            $elementos[] = $actual->dato;
-            $actual = $actual->siguiente;
-        }
+        $this->recorrerNodo($this->tope, $elementos);
         return $elementos;
+    }
+
+    private function recorrerNodo($nodo, &$elementos)
+    {
+        if ($nodo === null) {
+            return;
+        }
+        $elementos[] = $nodo->dato;
+        $this->recorrerNodo($nodo->siguiente, $elementos);
     }
 
     public function estaVacia()

@@ -18,22 +18,26 @@
                 <label class="form-label fw-semibold">Filtrar por categoría</label>
                 <select name="categoria_id" class="form-select">
                     <option value="">Todas las categorías</option>
-                    @foreach($categorias as $cat)
-                        <option value="{{ $cat->id }}" {{ request('categoria_id') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->nombre }}
+                    @php $ci = 0; @endphp
+                    @while($ci < count($categorias))
+                        <option value="{{ $categorias[$ci]->id }}" {{ request('categoria_id') == $categorias[$ci]->id ? 'selected' : '' }}>
+                            {{ $categorias[$ci]->nombre }}
                         </option>
-                    @endforeach
+                    @php $ci++; @endphp
+                    @endwhile
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-semibold">Filtrar por autor</label>
                 <select name="autor_id" class="form-select">
                     <option value="">Todos los autores</option>
-                    @foreach($autores as $autor)
-                        <option value="{{ $autor->id }}" {{ request('autor_id') == $autor->id ? 'selected' : '' }}>
-                            {{ $autor->nombre }}
+                    @php $ai = 0; @endphp
+                    @while($ai < count($autores))
+                        <option value="{{ $autores[$ai]->id }}" {{ request('autor_id') == $autores[$ai]->id ? 'selected' : '' }}>
+                            {{ $autores[$ai]->nombre }}
                         </option>
-                    @endforeach
+                    @php $ai++; @endphp
+                    @endwhile
                 </select>
             </div>
             <div class="col-md-2 d-flex gap-2">
@@ -44,7 +48,7 @@
     </form>
 </div>
 
-<p class="mb-3 text-muted">Mostrando <strong style="color:var(--vino-dark)">{{ count($elementos) }}</strong> libro(s)</p>
+<p class="mb-3 text-muted">Mostrando <strong style="color:var(--vino-dark)">{{ count($navegacion) }}</strong> libro(s)</p>
 
 <style>
     .libro-card {
@@ -102,36 +106,36 @@
 </style>
 
 <div class="row g-3">
-    @forelse($elementos as $elemento)
+    @php $i = 0; @endphp
+    @while($i < count($navegacion))
     <div class="col-6 col-sm-4 col-md-3 col-xl-2-4">
         <div class="libro-card">
             <div style="position:relative;">
-                @if($elemento['portada'])
-                    <img src="{{ asset('storage/'.$elemento['portada']) }}" class="libro-portada">
+                @if($navegacion[$i]['dato']['portada'])
+                    <img src="{{ asset('storage/'.$navegacion[$i]['dato']['portada']) }}" class="libro-portada">
                 @else
                     <div class="libro-placeholder">&#128218;</div>
                 @endif
-                <span class="libro-badge">{{ $elemento['categoria'] }}</span>
+                <span class="libro-badge">{{ $navegacion[$i]['dato']['categoria'] }}</span>
             </div>
             <div class="libro-info">
                 <div>
-                    <div class="libro-titulo">{{ $elemento['titulo'] }}</div>
-                    <p class="libro-autor">{{ $elemento['autor'] }}</p>
+                    <div class="libro-titulo">{{ $navegacion[$i]['dato']['titulo'] }}</div>
+                    <p class="libro-autor">{{ $navegacion[$i]['dato']['autor'] }}</p>
                 </div>
                 <div>
-                    <p class="libro-precio">S/ {{ number_format($elemento['precio'], 2) }}</p>
+                    <p class="libro-precio">S/ {{ number_format($navegacion[$i]['dato']['precio'], 2) }}</p>
                     <form method="POST" action="{{ route('carrito.agregar') }}">
                         @csrf
-                        <input type="hidden" name="libro_id" value="{{ $elemento['id'] }}">
+                        <input type="hidden" name="libro_id" value="{{ $navegacion[$i]['dato']['id'] }}">
                         <button type="submit" class="btn-carrito">🛒 Agregar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @empty
-    <div class="col-12 text-center py-5 text-muted">No se encontraron libros.</div>
-    @endforelse
+    @php $i++; @endphp
+    @endwhile
 </div>
 
 @endsection

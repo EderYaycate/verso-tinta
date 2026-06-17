@@ -2,34 +2,101 @@
 
 namespace App\DataStructures;
 
+class Nodo
+{
+    public $dato;
+    public $siguiente;
+
+    public function __construct($dato)
+    {
+        $this->dato = $dato;
+        $this->siguiente = null;
+    }
+}
+
 class ListaEnlazada
 {
-    private array $elementos = [];
+    private $cabeza;
+    private $tamanio;
 
-    public function insertar(array $dato): void
+    public function __construct()
     {
-        $this->elementos[] = $dato;
+        $this->cabeza = null;
+        $this->tamanio = 0;
     }
 
-    public function recorrer(): array
+    public function insertar($dato)
     {
-        return $this->elementos;
-    }
-
-    public function eliminar(int $id): void
-    {
-        $this->elementos = array_values(
-            array_filter($this->elementos, fn($e) => $e['id'] !== $id)
-        );
-    }
-
-    public function buscar(int $id): ?array
-    {
-        foreach ($this->elementos as $elemento) {
-            if ($elemento['id'] === $id) {
-                return $elemento;
-            }
+        $nuevo = new Nodo($dato);
+        if ($this->cabeza === null) {
+            $this->cabeza = $nuevo;
+        } else {
+            $this->insertarAlFinal($this->cabeza, $nuevo);
         }
-        return null;
+        $this->tamanio++;
+    }
+
+    private function insertarAlFinal($nodo, $nuevo)
+    {
+        if ($nodo->siguiente === null) {
+            $nodo->siguiente = $nuevo;
+            return;
+        }
+        $this->insertarAlFinal($nodo->siguiente, $nuevo);
+    }
+
+    public function recorrer()
+    {
+        $elementos = [];
+        $this->recorrerNodo($this->cabeza, $elementos);
+        return $elementos;
+    }
+
+    private function recorrerNodo($nodo, &$elementos)
+    {
+        if ($nodo === null) {
+            return;
+        }
+        $elementos[] = $nodo->dato;
+        $this->recorrerNodo($nodo->siguiente, $elementos);
+    }
+
+    public function buscar($id)
+    {
+        return $this->buscarNodo($this->cabeza, $id);
+    }
+
+    private function buscarNodo($nodo, $id)
+    {
+        if ($nodo === null) {
+            return null;
+        }
+        if ($nodo->dato['id'] === $id) {
+            return $nodo->dato;
+        }
+        return $this->buscarNodo($nodo->siguiente, $id);
+    }
+
+    public function eliminar($id)
+    {
+        $this->cabeza = $this->eliminarNodo($this->cabeza, $id);
+        $this->tamanio--;
+    }
+
+    private function eliminarNodo($nodo, $id)
+    {
+        if ($nodo === null) {
+            return null;
+        }
+        if ($nodo->dato['id'] === $id) {
+            return $nodo->siguiente;
+        }
+        $nodo->siguiente = $this->eliminarNodo($nodo->siguiente, $id);
+        return $nodo;
+    }
+
+    public function tamanio()
+    {
+        return $this->tamanio;
     }
 }

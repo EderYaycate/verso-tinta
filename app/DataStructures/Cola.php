@@ -27,7 +27,6 @@ class Cola
         $this->tamanio = 0;
     }
 
-    // Insertar elemento al final
     public function encolar($dato)
     {
         $nuevo = new NodoCola($dato);
@@ -41,10 +40,11 @@ class Cola
         $this->tamanio++;
     }
 
-    // Eliminar elemento del frente
     public function desencolar()
     {
-        if ($this->estaVacia()) return null;
+        if ($this->estaVacia()) {
+            return null;
+        }
         $dato = $this->frente->dato;
         $this->frente = $this->frente->siguiente;
         if ($this->frente === null) {
@@ -54,23 +54,28 @@ class Cola
         return $dato;
     }
 
-    // Ver el frente sin eliminar
     public function frente()
     {
-        if ($this->estaVacia()) return null;
+        if ($this->estaVacia()) {
+            return null;
+        }
         return $this->frente->dato;
     }
 
-    // Recorrer todos los elementos
     public function recorrer()
     {
         $elementos = [];
-        $actual = $this->frente;
-        while ($actual !== null) {
-            $elementos[] = $actual->dato;
-            $actual = $actual->siguiente;
-        }
+        $this->recorrerNodo($this->frente, $elementos);
         return $elementos;
+    }
+
+    private function recorrerNodo($nodo, &$elementos)
+    {
+        if ($nodo === null) {
+            return;
+        }
+        $elementos[] = $nodo->dato;
+        $this->recorrerNodo($nodo->siguiente, $elementos);
     }
 
     public function estaVacia()

@@ -57,16 +57,12 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">Explorar</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item {{ request()->routeIs('usuario.lista') ? 'active' : '' }}"
-                            href="{{ route('usuario.lista') }}">Catalogo de Libros</a></li>
                         <li><a class="dropdown-item {{ request()->routeIs('usuario.pila') ? 'active' : '' }}"
-                            href="{{ route('usuario.pila') }}">Ultimos Agregados</a></li>
-                        <li><a class="dropdown-item {{ request()->routeIs('usuario.cola') ? 'active' : '' }}"
-                            href="{{ route('usuario.cola') }}">Libros en Orden</a></li>
+                            href="{{ route('usuario.pila') }}">Últimos Agregados</a></li>
                         <li><a class="dropdown-item {{ request()->routeIs('usuario.arbol') ? 'active' : '' }}"
-                            href="{{ route('usuario.arbol') }}">Buscar Libros</a></li>
+                            href="{{ route('usuario.arbol') }}">Libros A-Z</a></li>
                         <li><a class="dropdown-item {{ request()->routeIs('usuario.grafo') ? 'active' : '' }}"
-                            href="{{ route('usuario.grafo') }}">Autores Relacionados</a></li>
+                            href="{{ route('usuario.grafo') }}">Autores Destacados</a></li>
                     </ul>
                 </li>
 

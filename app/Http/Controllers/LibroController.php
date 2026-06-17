@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Libro;
 use App\Models\Autor;
 use App\Models\Categoria;
+use App\Models\Carrito;
+use App\Models\PedidoItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -84,9 +86,22 @@ class LibroController extends Controller
 
     public function destroy(Libro $libro)
     {
+        // Verificar si el libro está en algún carrito
+        if (Carrito::where('libro_id', $libro->id)->exists()) {
+            return redirect()->route('libros.index')
+                ->with('error', 'No se puede eliminar el libro porque está en el carrito de un usuario.');
+        }
+
+        // Verificar si el libro está en algún pedido
+        if (PedidoItem::where('libro_id', $libro->id)->exists()) {
+            return redirect()->route('libros.index')
+                ->with('error', 'No se puede eliminar el libro porque forma parte de un pedido.');
+        }
+
         if ($libro->portada) {
             Storage::disk('public')->delete($libro->portada);
         }
+
         $libro->delete();
         return redirect()->route('libros.index')
                          ->with('success', 'Libro eliminado correctamente.');

@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
 
 <div class="card-custom p-3">
     <table class="table table-hover mb-0">
@@ -12,16 +11,21 @@
             </tr>
         </thead>
         <tbody>
-            @php $i = 0; @endphp
-            @while($i < count($inorden))
+            @php $i = 1; @endphp
+            @forelse($inorden as $libro)
             <tr>
-                <td>{{ $i + 1 }}</td>
-                <td class="fw-semibold">{{ $inorden[$i]['titulo'] }}</td>
-                <td>{{ $inorden[$i]['autor'] }}</td>
+                <td>{{ $i }}</td>
+                <td class="fw-semibold">{{ $libro['titulo'] }}</td>
+                <td>{{ $libro['autor'] }}</td>
             </tr>
             @php $i++; @endphp
-            @endwhile
+            @empty
+            <tr>
+                <td colspan="3" class="text-center">No hay libros registrados.</td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
+
 @endsection

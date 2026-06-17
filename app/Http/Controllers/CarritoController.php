@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrito;
-use App\Models\Libro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +14,12 @@ class CarritoController extends Controller
             ->where('user_id', Auth::id())
             ->get();
 
-        $total = $items->sum(fn($item) => $item->libro->precio * $item->cantidad);
+        $total = 0;
+        $i = 0;
+        while ($i < count($items)) {
+            $total += $items[$i]->libro->precio * $items[$i]->cantidad;
+            $i++;
+        }
 
         return view('usuario.carrito', compact('items', 'total'));
     }

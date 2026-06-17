@@ -83,17 +83,14 @@
     <a href="{{ route('estructuras.lista') }}" class="sidebar-item {{ request()->routeIs('estructuras.lista') ? 'active' : '' }}">
         <span class="sidebar-icon">&#9783;</span> Catalogo
     </a>
-    <a href="{{ route('estructuras.pila') }}" class="sidebar-item {{ request()->routeIs('estructuras.pila') ? 'active' : '' }}">
+    <a href="{{ route('estructuras.historial') }}" class="sidebar-item {{ request()->routeIs('estructuras.historial') ? 'active' : '' }}">
         <span class="sidebar-icon">&#9783;</span> Historial
     </a>
-    <a href="{{ route('estructuras.cola') }}" class="sidebar-item {{ request()->routeIs('estructuras.cola') ? 'active' : '' }}">
-        <span class="sidebar-icon">&#9783;</span> Solicitudes
-    </a>
     <a href="{{ route('estructuras.arbol') }}" class="sidebar-item {{ request()->routeIs('estructuras.arbol') ? 'active' : '' }}">
-        <span class="sidebar-icon">&#9783;</span> Busqueda
+        <span class="sidebar-icon">&#9783;</span> Libros A-Z
     </a>
     <a href="{{ route('estructuras.grafo') }}" class="sidebar-item {{ request()->routeIs('estructuras.grafo') ? 'active' : '' }}">
-        <span class="sidebar-icon">&#9783;</span> Relaciones
+        <span class="sidebar-icon">&#9783;</span> Autores Destacados
     </a>
 
     <div class="sidebar-quote">

@@ -30,9 +30,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('categorias', CategoriaController::class);
     Route::resource('autores', AutorController::class);
     Route::resource('libros', LibroController::class);
-    Route::get('/estructuras/catalogo-libros', [App\Http\Controllers\EstructuraController::class, 'listaEnlazada'])->name('estructuras.lista');
-    Route::get('/estructuras/historial-libros', [App\Http\Controllers\EstructuraController::class, 'pila'])->name('estructuras.pila');
-    Route::get('/estructuras/solicitudes-libros', [App\Http\Controllers\EstructuraController::class, 'cola'])->name('estructuras.cola');
+    Route::get('/estructuras/catalogo-libros/{id?}', [App\Http\Controllers\EstructuraController::class, 'listaEnlazada'])->name('estructuras.lista');
+    Route::get('/estructuras/historial-compras', [App\Http\Controllers\EstructuraController::class, 'historialCompras'])->name('estructuras.historial');
     Route::get('/estructuras/busqueda-libros', [App\Http\Controllers\EstructuraController::class, 'arbolBinario'])->name('estructuras.arbol');
     Route::get('/estructuras/relacion-autores', [App\Http\Controllers\EstructuraController::class, 'grafo'])->name('estructuras.grafo');
     Route::get('/admin/pedidos', [PedidoController::class, 'adminIndex'])->name('admin.pedidos');
@@ -40,7 +39,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:usuario'])->group(function () {
-    Route::get('/usuario/catalogo-libros', [App\Http\Controllers\EstructuraController::class, 'listaEnlazadaUsuario'])->name('usuario.lista');
+    Route::get('/usuario/catalogo-libros/{id?}', [App\Http\Controllers\EstructuraController::class, 'listaEnlazadaUsuario'])->name('usuario.lista');
     Route::get('/usuario/ultimos-libros', [App\Http\Controllers\EstructuraController::class, 'pilaUsuario'])->name('usuario.pila');
     Route::get('/usuario/libros-en-orden', [App\Http\Controllers\EstructuraController::class, 'colaUsuario'])->name('usuario.cola');
     Route::get('/usuario/buscar-libros', [App\Http\Controllers\EstructuraController::class, 'arbolUsuario'])->name('usuario.arbol');
