@@ -4,7 +4,7 @@
     <div class="col-md-6">
         <div class="card-custom p-4">
             <h2 class="page-title mb-4">Nuevo Autor</h2>
-            <form action="{{ route('autores.store') }}" method="POST">
+            <form action="{{ route('autores.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nombre</label>
@@ -15,6 +15,11 @@
                     <label class="form-label fw-semibold">Nacionalidad</label>
                     <input type="text" name="nacionalidad" value="{{ old('nacionalidad') }}" class="form-control" required>
                     @error('nacionalidad')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Foto del autor</label>
+                    <input type="file" name="foto" class="form-control" accept="image/*">
+                    @error('foto')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                 </div>
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-vino px-4">Guardar</button>

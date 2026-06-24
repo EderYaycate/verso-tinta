@@ -1,31 +1,68 @@
 @extends('layouts.admin')
 @section('content')
 
-<div class="card-custom p-3">
-    <table class="table table-hover mb-0">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Titulo</th>
-                <th>Autor</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $i = 1; @endphp
-            @forelse($inorden as $libro)
-            <tr>
-                <td>{{ $i }}</td>
-                <td class="fw-semibold">{{ $libro['titulo'] }}</td>
-                <td>{{ $libro['autor'] }}</td>
-            </tr>
-            @php $i++; @endphp
-            @empty
-            <tr>
-                <td colspan="3" class="text-center">No hay libros registrados.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+<h2 class="page-title mb-1">Libros A-Z</h2>
+<div class="mb-4" style="height:3px;width:40px;background:var(--vino);"></div>
+<p class="text-muted mb-4">Mostrando <strong style="color:var(--vino-dark)">{{ count($inorden) }}</strong> libro(s) ordenados alfabéticamente.</p>
+
+<style>
+    .libro-card-az {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+    }
+    .libro-card-az:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(107,28,28,0.15);
+    }
+    .libro-portada-az { width: 100%; height: 200px; object-fit: cover; }
+    .libro-placeholder-az {
+        width: 100%; height: 200px;
+        background: linear-gradient(160deg, var(--vino-dark), var(--vino));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; color: rgba(255,255,255,0.3);
+    }
+    .numero-badge {
+        position: absolute; top: 10px; left: 10px;
+        background: var(--vino); color: #fff;
+        width: 28px; height: 28px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.75rem; font-weight: 700;
+    }
+    @media (min-width: 1200px) { .col-xl-2-4 { width: 20%; } }
+</style>
+
+<div class="row g-3">
+    @forelse($inorden as $i => $libro)
+    <div class="col-6 col-sm-4 col-md-3 col-xl-2-4">
+        <div class="libro-card-az">
+            <div style="position:relative;">
+                @if($libro['portada'])
+                    <img src="{{ asset('storage/'.$libro['portada']) }}" class="libro-portada-az">
+                @else
+                    <div class="libro-placeholder-az">📚</div>
+                @endif
+                <span class="numero-badge">{{ $i + 1 }}</span>
+            </div>
+            <div class="p-3 text-center">
+                <div class="fw-bold mb-1" style="font-size:0.88rem;color:var(--vino-dark);font-family:Georgia,serif;">{{ $libro['titulo'] }}</div>
+                <div class="small mb-1" style="color:#888">{{ $libro['autor'] }}</div>
+                <div class="fw-bold mb-2" style="color:var(--vino)">S/ {{ number_format($libro['precio'], 2) }}</div>
+                <div class="d-flex gap-1 justify-content-center">
+                    <a href="{{ route('libros.edit', $libro['id']) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <form method="POST" action="{{ route('libros.destroy', $libro['id']) }}">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="col-12 text-center text-muted py-5">No hay libros registrados.</div>
+    @endforelse
 </div>
 
 @endsection

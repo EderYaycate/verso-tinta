@@ -5,33 +5,28 @@
 <p class="text-muted mb-4">Autores destacados por sus géneros literarios y sus conexiones con otros autores.</p>
 
 <div class="row g-4">
-    @php $autores = array_keys($aristas); $i = 0; @endphp
-    @while($i < count($autores))
-        @php $autor = $autores[$i]; $conexiones = $aristas[$autor]; @endphp
+    @php $autoresKeys = array_keys($aristas); $i = 0; @endphp
+    @while($i < count($autoresKeys))
+        @php $autor = $autoresKeys[$i]; $conexiones = $aristas[$autor]; @endphp
         @if(count($conexiones) > 0)
         <div class="col-md-6 col-lg-4">
             <div class="card-custom overflow-hidden">
-                {{-- Imagen --}}
-                @if(isset($portadas[$autor]) && $portadas[$autor])
-                    <img src="{{ asset('storage/'.$portadas[$autor]) }}"
+                @if(isset($fotosAutores[$autor]) && $fotosAutores[$autor])
+                    <img src="{{ asset('storage/'.$fotosAutores[$autor]) }}"
                         style="width:100%;height:160px;object-fit:cover;">
                 @else
                     <div style="width:100%;height:160px;background:linear-gradient(135deg,var(--vino-dark),var(--vino));display:flex;align-items:center;justify-content:center;font-size:2.5rem;">✍️</div>
                 @endif
 
                 <div class="p-3">
-                    {{-- Nombre del autor --}}
                     <h6 class="fw-bold mb-3" style="color:var(--vino-dark);font-family:Georgia,serif;font-size:1rem;">{{ $autor }}</h6>
 
-                    {{-- Géneros en los que destaca --}}
                     @php
                         $generos = [];
                         $j = 0;
                         while ($j < count($conexiones)) {
                             $cat = $conexiones[$j]['categoria'];
-                            if (!in_array($cat, $generos)) {
-                                $generos[] = $cat;
-                            }
+                            if (!in_array($cat, $generos)) $generos[] = $cat;
                             $j++;
                         }
                     @endphp
@@ -46,7 +41,6 @@
                         </div>
                     </div>
 
-                    {{-- Relaciones con otros autores --}}
                     <div>
                         <p class="small fw-semibold text-muted mb-1">🔗 Relacionado con:</p>
                         @php $j = 0; @endphp

@@ -156,4 +156,25 @@ class ArbolBinario
         $this->postordenRecursivo($nodo->derecho, $resultado);
         $resultado[] = $nodo->dato;
     }
+
+    public function buscarPorRango($min, $max)
+    {
+        $resultado = [];
+        $this->buscarRangoNodo($this->raiz, $min, $max, $resultado);
+        return $resultado;
+    }
+
+    private function buscarRangoNodo($nodo, $min, $max, &$resultado)
+    {
+        if ($nodo === null) {
+            return;
+        }
+
+        if ($nodo->dato['precio'] >= $min && $nodo->dato['precio'] <= $max) {
+            $resultado[] = $nodo->dato;
+        }
+
+        $this->buscarRangoNodo($nodo->izquierdo, $min, $max, $resultado);
+        $this->buscarRangoNodo($nodo->derecho, $min, $max, $resultado);
+    }
 }

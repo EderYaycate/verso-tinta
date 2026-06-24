@@ -76,28 +76,28 @@ class EstructuraController extends Controller
     }
 
     public function arbolBinario()
-    {
-        $arbol = new ArbolBinario();
-        $libros = Libro::with('autor')->get();
+{
+    $arbol = new ArbolBinario();
+    $libros = Libro::with('autor')->get();
 
-        $i = 0;
-        while ($i < count($libros)) {
-            $arbol->insertar([
-                'id'      => $libros[$i]->id,
-                'titulo'  => $libros[$i]->titulo,
-                'autor'   => $libros[$i]->autor->nombre,
-                'portada' => $libros[$i]->portada,
-            ]);
-            $i++;
-        }
-
-        $inorden   = $arbol->inorden();
-        $preorden  = $arbol->preorden();
-        $postorden = $arbol->postorden();
-
-        return view('estructuras.arbol-binario', compact('inorden', 'preorden', 'postorden'));
+    $i = 0;
+    while ($i < count($libros)) {
+        $arbol->insertar([
+            'id'      => $libros[$i]->id,
+            'titulo'  => $libros[$i]->titulo,
+            'autor'   => $libros[$i]->autor->nombre,
+            'portada' => $libros[$i]->portada,
+            'precio'  => $libros[$i]->precio,
+        ]);
+        $i++;
     }
 
+    $inorden   = $arbol->inorden();
+    $preorden  = $arbol->preorden();
+    $postorden = $arbol->postorden();
+
+    return view('estructuras.arbol-binario', compact('inorden', 'preorden', 'postorden'));
+}
     public function grafo()
     {
         $grafo   = new Grafo();
@@ -107,7 +107,16 @@ class EstructuraController extends Controller
         $vertices = array_values($grafo->obtenerVertices());
         $aristas  = $grafo->obtenerAristas();
 
-        return view('estructuras.grafo', compact('vertices', 'aristas'));
+        $fotosAutores = [];
+        $idsAutores   = [];
+        $i = 0;
+        while ($i < count($autores)) {
+            $fotosAutores[$autores[$i]->nombre] = $autores[$i]->foto;
+            $idsAutores[$autores[$i]->nombre]   = $autores[$i]->id;
+            $i++;
+        }
+
+        return view('estructuras.grafo', compact('vertices', 'aristas', 'fotosAutores', 'idsAutores'));
     }
 
     public function historialCompras()
@@ -249,11 +258,20 @@ class EstructuraController extends Controller
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
                 'portada' => $libros[$i]->portada,
+                'precio'  => $libros[$i]->precio,
             ]);
             $i++;
         }
 
-        $inorden = $arbol->inorden();
+        $min = request('precio_min', 0);
+        $max = request('precio_max', 9999);
+
+        if (request('precio_min') || request('precio_max')) {
+            $inorden = $arbol->buscarPorRango($min, $max);
+        } else {
+            $inorden = $arbol->inorden();
+        }
+
         return view('usuario.arbol', compact('inorden'));
     }
 
@@ -266,7 +284,14 @@ class EstructuraController extends Controller
         $vertices = array_values($grafo->obtenerVertices());
         $aristas  = $grafo->obtenerAristas();
 
-        return view('usuario.grafo', compact('vertices', 'aristas'));
+        $fotosAutores = [];
+        $i = 0;
+        while ($i < count($autores)) {
+            $fotosAutores[$autores[$i]->nombre] = $autores[$i]->foto;
+            $i++;
+        }
+
+        return view('usuario.grafo', compact('vertices', 'aristas', 'fotosAutores'));
     }
 
     private function construirGrafo(Grafo $grafo, $autores)

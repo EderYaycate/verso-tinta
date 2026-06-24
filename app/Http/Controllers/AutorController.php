@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Autor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AutorController extends Controller
 {
@@ -23,9 +24,16 @@ class AutorController extends Controller
         $request->validate([
             'nombre'       => 'required|string|max:255',
             'nacionalidad' => 'required|string|max:255',
+            'foto'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        Autor::create($request->only(['nombre', 'nacionalidad']));
+        $data = $request->only(['nombre', 'nacionalidad']);
+
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('autores', 'public');
+        }
+
+        Autor::create($data);
         return redirect()->route('autores.index')
                          ->with('success', 'Autor creado correctamente.');
     }
@@ -46,18 +54,27 @@ class AutorController extends Controller
         $request->validate([
             'nombre'       => 'required|string|max:255',
             'nacionalidad' => 'required|string|max:255',
+            'foto'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $autor->update($request->only(['nombre', 'nacionalidad']));
+        $data = $request->only(['nombre', 'nacionalidad']);
+
+        if ($request->hasFile('foto')) {
+            if ($autor->foto) {
+                Storage::disk('public')->delete($autor->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('autores', 'public');
+        }
+
+        $autor->update($data);
         return redirect()->route('autores.index')
                          ->with('success', 'Autor actualizado correctamente.');
     }
 
     public function destroy(Autor $autor)
     {
-        if ($autor->libros()->count() > 0) {
-            return redirect()->route('autores.index')
-                ->with('error', 'No se puede eliminar el autor porque tiene libros asociados.');
+        if ($autor->foto) {
+            Storage::disk('public')->delete($autor->foto);
         }
 
         $autor->delete();

@@ -2,7 +2,38 @@
 @section('content')
 <h2 class="page-title mb-1">Libros A-Z</h2>
 <div class="mb-4" style="height:3px;width:40px;background:var(--vino);"></div>
-<p class="text-muted mb-4">Libros ordenados alfabéticamente por título.</p>
+
+<div class="card-custom p-4 mb-4">
+    <form method="GET" action="{{ route('usuario.arbol') }}">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Precio mínimo (S/)</label>
+                <input type="number" name="precio_min" class="form-control"
+                    placeholder="Ej: 20"
+                    value="{{ request('precio_min') }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Precio máximo (S/)</label>
+                <input type="number" name="precio_max" class="form-control"
+                    placeholder="Ej: 100"
+                    value="{{ request('precio_max') }}">
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-vino w-100">Filtrar</button>
+                <a href="{{ route('usuario.arbol') }}" class="btn btn-outline-secondary w-100">Limpiar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<p class="text-muted mb-4">
+    Mostrando <strong style="color:var(--vino-dark)">{{ count($inorden) }}</strong> libro(s)
+    @if(request('precio_min') || request('precio_max'))
+        entre <strong>S/ {{ request('precio_min', 0) }}</strong> y <strong>S/ {{ request('precio_max', 9999) }}</strong>
+    @else
+        ordenados alfabéticamente.
+    @endif
+</p>
 
 <style>
     .libro-card-az {
@@ -34,25 +65,28 @@
 </style>
 
 <div class="row g-3">
-    @php $i = 0; @endphp
-    @while($i < count($inorden))
+    @forelse($inorden as $i => $libro)
     <div class="col-6 col-sm-4 col-md-3 col-xl-2-4">
         <div class="libro-card-az">
             <div style="position:relative;">
-                @if($inorden[$i]['portada'])
-                    <img src="{{ asset('storage/'.$inorden[$i]['portada']) }}" class="libro-portada-az">
+                @if($libro['portada'])
+                    <img src="{{ asset('storage/'.$libro['portada']) }}" class="libro-portada-az">
                 @else
                     <div class="libro-placeholder-az">📚</div>
                 @endif
                 <span class="numero-badge">{{ $i + 1 }}</span>
             </div>
             <div class="p-3 text-center">
-                <div class="fw-bold mb-1" style="font-size:0.88rem;color:var(--vino-dark);font-family:Georgia,serif;">{{ $inorden[$i]['titulo'] }}</div>
-                <div class="small" style="color:#888">{{ $inorden[$i]['autor'] }}</div>
+                <div class="fw-bold mb-1" style="font-size:0.88rem;color:var(--vino-dark);font-family:Georgia,serif;">{{ $libro['titulo'] }}</div>
+                <div class="small mb-1" style="color:#888">{{ $libro['autor'] }}</div>
+                <div class="fw-bold" style="color:var(--vino)">S/ {{ number_format($libro['precio'], 2) }}</div>
             </div>
         </div>
     </div>
-    @php $i++; @endphp
-    @endwhile
+    @empty
+    <div class="col-12 text-center text-muted py-5">
+        No se encontraron libros en ese rango de precio.
+    </div>
+    @endforelse
 </div>
 @endsection
