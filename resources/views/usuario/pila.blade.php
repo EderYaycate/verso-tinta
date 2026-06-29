@@ -10,7 +10,10 @@
     <div class="col-sm-6 col-lg-3">
         <div class="card-custom h-100">
             @if($elementos[$i]['portada'])
-                <img src="{{ asset('storage/'.$elementos[$i]['portada']) }}" class="portada-img">
+                <div style="width:100%;height:220px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <img src="{{ asset('storage/'.$elementos[$i]['portada']) }}"
+                        style="width:100%;height:220px;object-fit:contain;">
+                </div>
             @else
                 <div class="portada-placeholder"></div>
             @endif

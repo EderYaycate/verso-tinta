@@ -36,6 +36,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/estructuras/relacion-autores', [App\Http\Controllers\EstructuraController::class, 'grafo'])->name('estructuras.grafo');
     Route::get('/admin/pedidos', [PedidoController::class, 'adminIndex'])->name('admin.pedidos');
     Route::patch('/admin/pedidos/{pedido}', [PedidoController::class, 'adminActualizar'])->name('admin.pedidos.actualizar');
+    Route::post('/autores/{id}/actualizar', [AutorController::class, 'actualizar'])->name('autores.actualizar');
+    Route::get('/autores/{id}/actualizar-autor', [AutorController::class, 'editarAutor'])->name('autores.editarAutor');
+    Route::post('/autores/{id}/actualizar-autor', [AutorController::class, 'guardarAutor'])->name('autores.guardarAutor');
+    Route::post('/autores/{id}/eliminar', [AutorController::class, 'eliminarAutor'])->name('autores.eliminarAutor');
 });
 
 Route::middleware(['auth', 'role:usuario'])->group(function () {
@@ -43,7 +47,7 @@ Route::middleware(['auth', 'role:usuario'])->group(function () {
     Route::get('/usuario/ultimos-libros', [App\Http\Controllers\EstructuraController::class, 'pilaUsuario'])->name('usuario.pila');
     Route::get('/usuario/libros-en-orden', [App\Http\Controllers\EstructuraController::class, 'colaUsuario'])->name('usuario.cola');
     Route::get('/usuario/buscar-libros', [App\Http\Controllers\EstructuraController::class, 'arbolUsuario'])->name('usuario.arbol');
-    Route::get('/usuario/autores-relacionados', [App\Http\Controllers\EstructuraController::class, 'grafoUsuario'])->name('usuario.grafo');
+    Route::get('/usuario/autores-destacados', [App\Http\Controllers\EstructuraController::class, 'grafoUsuario'])->name('usuario.grafo');
 
     // Carrito
     Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');

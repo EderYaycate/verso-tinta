@@ -9,7 +9,10 @@
     <div class="col-sm-6 col-lg-4">
         <div class="card-custom h-100">
             @if($libro->portada)
-                <img src="{{ asset('storage/'.$libro->portada) }}" class="portada-img">
+                <div style="width:100%;height:220px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <img src="{{ asset('storage/'.$libro->portada) }}"
+                        style="width:100%;height:220px;object-fit:contain;">
+                </div>
             @else
                 <div class="portada-placeholder"></div>
             @endif

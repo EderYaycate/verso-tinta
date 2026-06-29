@@ -76,47 +76,58 @@ class EstructuraController extends Controller
     }
 
     public function arbolBinario()
-{
-    $arbol = new ArbolBinario();
-    $libros = Libro::with('autor')->get();
+    {
+        $arbol = new ArbolBinario();
+        $libros = Libro::with('autor')->get();
 
-    $i = 0;
-    while ($i < count($libros)) {
-        $arbol->insertar([
-            'id'      => $libros[$i]->id,
-            'titulo'  => $libros[$i]->titulo,
-            'autor'   => $libros[$i]->autor->nombre,
-            'portada' => $libros[$i]->portada,
-            'precio'  => $libros[$i]->precio,
-        ]);
-        $i++;
+        $i = 0;
+        while ($i < count($libros)) {
+            $arbol->insertar([
+                'id'      => $libros[$i]->id,
+                'titulo'  => $libros[$i]->titulo,
+                'autor'   => $libros[$i]->autor->nombre,
+                'portada' => $libros[$i]->portada,
+                'precio'  => $libros[$i]->precio,
+            ]);
+            $i++;
+        }
+
+        $inorden   = $arbol->inorden();
+        $preorden  = $arbol->preorden();
+        $postorden = $arbol->postorden();
+
+        return view('estructuras.arbol-binario', compact('inorden', 'preorden', 'postorden'));
     }
 
-    $inorden   = $arbol->inorden();
-    $preorden  = $arbol->preorden();
-    $postorden = $arbol->postorden();
-
-    return view('estructuras.arbol-binario', compact('inorden', 'preorden', 'postorden'));
-}
     public function grafo()
     {
         $grafo   = new Grafo();
         $autores = Autor::with(['libros.categoria'])->get();
         $this->construirGrafo($grafo, $autores);
 
-        $vertices = array_values($grafo->obtenerVertices());
-        $aristas  = $grafo->obtenerAristas();
+        $vertices      = array_values($grafo->obtenerVertices());
+        $aristas       = $grafo->obtenerAristas();
+        $fotosAutores  = [];
+        $idsAutores    = [];
+        $librosAutores = [];
 
-        $fotosAutores = [];
-        $idsAutores   = [];
         $i = 0;
         while ($i < count($autores)) {
-            $fotosAutores[$autores[$i]->nombre] = $autores[$i]->foto;
-            $idsAutores[$autores[$i]->nombre]   = $autores[$i]->id;
+            $fotosAutores[$autores[$i]->nombre]  = $autores[$i]->foto;
+            $idsAutores[$autores[$i]->nombre]    = $autores[$i]->id;
+            $librosAutores[$autores[$i]->nombre] = [
+                'biografia' => $autores[$i]->biografia,
+                'libros'    => $autores[$i]->libros->map(function($l) {
+                    return [
+                        'titulo'  => $l->titulo,
+                        'portada' => $l->portada,
+                    ];
+                })->toArray(),
+            ];
             $i++;
         }
 
-        return view('estructuras.grafo', compact('vertices', 'aristas', 'fotosAutores', 'idsAutores'));
+        return view('estructuras.grafo', compact('vertices', 'aristas', 'fotosAutores', 'idsAutores', 'librosAutores'));
     }
 
     public function historialCompras()
@@ -281,17 +292,27 @@ class EstructuraController extends Controller
         $autores = Autor::with(['libros.categoria'])->get();
         $this->construirGrafo($grafo, $autores);
 
-        $vertices = array_values($grafo->obtenerVertices());
-        $aristas  = $grafo->obtenerAristas();
+        $vertices      = array_values($grafo->obtenerVertices());
+        $aristas       = $grafo->obtenerAristas();
+        $fotosAutores  = [];
+        $librosAutores = [];
 
-        $fotosAutores = [];
         $i = 0;
         while ($i < count($autores)) {
-            $fotosAutores[$autores[$i]->nombre] = $autores[$i]->foto;
+            $fotosAutores[$autores[$i]->nombre]  = $autores[$i]->foto;
+            $librosAutores[$autores[$i]->nombre] = [
+                'biografia' => $autores[$i]->biografia,
+                'libros'    => $autores[$i]->libros->map(function($l) {
+                    return [
+                        'titulo'  => $l->titulo,
+                        'portada' => $l->portada,
+                    ];
+                })->toArray(),
+            ];
             $i++;
         }
 
-        return view('usuario.grafo', compact('vertices', 'aristas', 'fotosAutores'));
+        return view('usuario.grafo', compact('vertices', 'aristas', 'fotosAutores', 'librosAutores'));
     }
 
     private function construirGrafo(Grafo $grafo, $autores)
@@ -304,7 +325,9 @@ class EstructuraController extends Controller
 
         $i = 0;
         while ($i < count($autores)) {
-            $categoriasA = $autores[$i]->libros->pluck('categoria.nombre')->unique()->toArray();
+            $categoriasA = array_values(
+                $autores[$i]->libros->pluck('categoria.nombre')->unique()->toArray()
+            );
             $this->conectarConSiguientes($grafo, $autores, $categoriasA, $i, $i + 1);
             $i++;
         }
@@ -316,13 +339,18 @@ class EstructuraController extends Controller
             return;
         }
 
-        $categoriasB = $autores[$j]->libros->pluck('categoria.nombre')->unique()->toArray();
+        $categoriasB = array_values(
+            $autores[$j]->libros->pluck('categoria.nombre')->unique()->toArray()
+        );
         $this->compararCategorias($grafo, $autores[$i]->nombre, $autores[$j]->nombre, $categoriasA, $categoriasB, 0, 0);
         $this->conectarConSiguientes($grafo, $autores, $categoriasA, $i, $j + 1);
     }
 
     private function compararCategorias(Grafo $grafo, $nombreA, $nombreB, $catA, $catB, $k, $l)
     {
+        $catA = array_values($catA);
+        $catB = array_values($catB);
+
         if ($k >= count($catA)) {
             return;
         }

@@ -88,3 +88,89 @@ class Cola
         return $this->tamanio;
     }
 }
+
+class NodoColaPrioridad
+{
+    public $dato;
+    public $prioridad;
+    public $siguiente;
+
+    public function __construct($dato, $prioridad)
+    {
+        $this->dato      = $dato;
+        $this->prioridad = $prioridad;
+        $this->siguiente = null;
+    }
+}
+
+class ColaPrioridad
+{
+    private $frente;
+    private $tamanio;
+
+    public function __construct()
+    {
+        $this->frente  = null;
+        $this->tamanio = 0;
+    }
+
+    public function encolar($dato, $prioridad)
+    {
+        $nuevo = new NodoColaPrioridad($dato, $prioridad);
+
+        if ($this->frente === null || $prioridad > $this->frente->prioridad) {
+            $nuevo->siguiente = $this->frente;
+            $this->frente     = $nuevo;
+        } else {
+            $this->insertarOrdenado($this->frente, $nuevo);
+        }
+        $this->tamanio++;
+    }
+
+    private function insertarOrdenado($nodo, $nuevo)
+    {
+        if ($nodo->siguiente === null || $nuevo->prioridad > $nodo->siguiente->prioridad) {
+            $nuevo->siguiente = $nodo->siguiente;
+            $nodo->siguiente  = $nuevo;
+        } else {
+            $this->insertarOrdenado($nodo->siguiente, $nuevo);
+        }
+    }
+
+    public function desencolar()
+    {
+        if ($this->estaVacia()) {
+            return null;
+        }
+        $dato         = $this->frente->dato;
+        $this->frente = $this->frente->siguiente;
+        $this->tamanio--;
+        return $dato;
+    }
+
+    public function recorrer()
+    {
+        $elementos = [];
+        $this->recorrerNodo($this->frente, $elementos);
+        return $elementos;
+    }
+
+    private function recorrerNodo($nodo, &$elementos)
+    {
+        if ($nodo === null) {
+            return;
+        }
+        $elementos[] = $nodo->dato;
+        $this->recorrerNodo($nodo->siguiente, $elementos);
+    }
+
+    public function estaVacia()
+    {
+        return $this->frente === null;
+    }
+
+    public function tamanio()
+    {
+        return $this->tamanio;
+    }
+}

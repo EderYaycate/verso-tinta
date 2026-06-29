@@ -5,51 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verso & Tinta — Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --vino: #6B1C1C;
-            --vino-dark: #3d0f0f;
-            --vino-light: #8B2525;
-            --crema: #f5f0e8;
-        }
-        body {
-            background-color: var(--crema);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            width: 100%;
-            max-width: 420px;
-        }
-        .card-header {
-            background-color: var(--vino);
-            color: white;
-            text-align: center;
-            border-radius: 12px 12px 0 0 !important;
-            padding: 2rem;
-        }
-        .card-header h4 { margin: 0; font-weight: 700; letter-spacing: 1px; }
-        .card-header p { margin: 0; font-size: 0.85rem; opacity: 0.8; }
-        .btn-vino { background-color: var(--vino); color: white; border: none; width: 100%; padding: 0.6rem; font-weight: 600; }
-        .btn-vino:hover { background-color: var(--vino-dark); color: white; }
-        .form-control:focus { border-color: var(--vino-light); box-shadow: 0 0 0 0.2rem rgba(107,28,28,0.2); }
+        :root { --vino:#6B1C1C; --vino-dark:#3d0f0f; --vino-light:#8B2525; --crema:#f5f0e8; --dorado:#c9a87c; }
+        * { box-sizing:border-box; }
+        body { background-color:var(--crema); min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:'Montserrat',sans-serif; }
+
+        .login-card { width:100%; max-width:420px; border-radius:16px; overflow:hidden; box-shadow:0 12px 40px rgba(61,15,15,0.18); }
+
+        .login-header { background:linear-gradient(135deg,var(--vino-dark),var(--vino)); padding:2.2rem 2rem; text-align:center; position:relative; }
+        .login-header::after { content:''; position:absolute; bottom:-1px; left:0; right:0; height:20px; background:var(--crema); border-radius:50% 50% 0 0 / 100% 100% 0 0; }
+        .login-header h4 { margin:0 0 4px; font-weight:800; font-size:1.5rem; color:#fff; font-family:Georgia,serif; letter-spacing:1px; }
+        .login-header .subtitulo { font-size:0.78rem; color:var(--dorado); letter-spacing:2px; text-transform:uppercase; }
+        .login-header .separador { width:40px; height:3px; background:var(--dorado); margin:12px auto 0; border-radius:2px; }
+
+        .login-body { background:#fff; padding:2rem 2rem 2.5rem; }
+
+        .form-label { font-size:0.85rem; font-weight:600; color:var(--vino-dark); margin-bottom:5px; }
+        .form-control { border:1.5px solid #e0d6cc; border-radius:8px; padding:10px 14px; font-size:0.9rem; font-family:'Montserrat',sans-serif; transition:border-color 0.2s; }
+        .form-control:focus { border-color:var(--vino); box-shadow:0 0 0 3px rgba(107,28,28,0.12); outline:none; }
+
+        .form-check-input:checked { background-color:var(--vino); border-color:var(--vino); }
+        .form-check-label { font-size:0.85rem; color:#666; }
+
+        .btn-login { background:linear-gradient(135deg,var(--vino-dark),var(--vino)); color:#fff; border:none; width:100%; padding:11px; font-weight:700; font-size:0.95rem; border-radius:8px; font-family:'Montserrat',sans-serif; letter-spacing:0.5px; transition:opacity 0.2s; margin-top:4px; }
+        .btn-login:hover { opacity:0.9; color:#fff; }
+
+        .link-vino { color:var(--vino); text-decoration:none; font-size:0.82rem; font-weight:600; }
+        .link-vino:hover { color:var(--vino-dark); text-decoration:underline; }
+
+        .divider { border:none; border-top:1px solid #f0e8e0; margin:1.2rem 0; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-header">
+    <div class="login-card">
+        <div class="login-header">
             <h4>Verso & Tinta</h4>
-            <p>Librería digital</p>
+            <p class="subtitulo">Librería Literaria</p>
+            <div class="separador"></div>
         </div>
-        <div class="card-body p-4">
+        <div class="login-body">
 
             @if (session('status'))
-                <div class="alert alert-success mb-3">{{ session('status') }}</div>
+                <div class="alert alert-success mb-3" style="font-size:0.85rem;">{{ session('status') }}</div>
             @endif
 
             <form method="POST" action="{{ route('login') }}">
@@ -57,20 +55,22 @@
                 <input type="hidden" name="redirect" value="{{ request('redirect') }}">
 
                 <div class="mb-3">
-                    <label for="email" class="form-label fw-semibold">Correo electrónico</label>
+                    <label for="email" class="form-label">Correo electrónico</label>
                     <input id="email" type="email" name="email"
                         class="form-control @error('email') is-invalid @enderror"
-                        value="{{ old('email') }}" required autofocus autocomplete="username">
+                        value="{{ old('email') }}" required autofocus autocomplete="username"
+                        placeholder="tucorreo@email.com">
                     @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label fw-semibold">Contraseña</label>
+                    <label for="password" class="form-label">Contraseña</label>
                     <input id="password" type="password" name="password"
                         class="form-control @error('password') is-invalid @enderror"
-                        required autocomplete="current-password">
+                        required autocomplete="current-password"
+                        placeholder="••••••••">
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -81,17 +81,15 @@
                     <label class="form-check-label" for="remember_me">Recordarme</label>
                 </div>
 
-                <button type="submit" class="btn btn-vino">Iniciar sesión</button>
+                <button type="submit" class="btn-login">Iniciar sesión</button>
 
-                @if (Route::has('password.request'))
-                    <div class="text-center mt-3">
-                        <a href="{{ route('password.request') }}"
-                            class="text-decoration-none small"
-                            style="color: var(--vino);">
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                    </div>
-                @endif
+                <hr class="divider">
+
+                <div class="text-center">
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="link-vino">¿Olvidaste tu contraseña?</a>
+                    @endif
+                </div>
             </form>
         </div>
     </div>

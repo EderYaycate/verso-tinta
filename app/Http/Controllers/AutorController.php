@@ -34,7 +34,7 @@ class AutorController extends Controller
         }
 
         Autor::create($data);
-        return redirect()->route('autores.index')
+        return redirect()->route('estructuras.grafo')
                          ->with('success', 'Autor creado correctamente.');
     }
 
@@ -67,9 +67,63 @@ class AutorController extends Controller
         }
 
         $autor->update($data);
-        return redirect()->route('autores.index')
+        return redirect()->route('estructuras.grafo')
                          ->with('success', 'Autor actualizado correctamente.');
     }
+
+    public function actualizar(Request $request, $id)
+    {
+        $autor = Autor::find($id);
+
+        $request->validate([
+            'nombre'       => 'required|string|max:255',
+            'nacionalidad' => 'required|string|max:255',
+            'foto'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $data = $request->only(['nombre', 'nacionalidad']);
+
+        if ($request->hasFile('foto')) {
+            if ($autor->foto) {
+                Storage::disk('public')->delete($autor->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('autores', 'public');
+        }
+
+        $autor->update($data);
+        return redirect()->route('estructuras.grafo')
+                         ->with('success', 'Autor actualizado correctamente.');
+    }
+
+    public function editarAutor($id)
+    {
+        $autor = Autor::find($id);
+        return view('autores.editar-autor', compact('autor'));
+    }
+
+    public function guardarAutor(Request $request, $id)
+{
+    $autor = Autor::find($id);
+
+    $request->validate([
+        'nombre'       => 'required|string|max:255',
+        'nacionalidad' => 'required|string|max:255',
+        'foto'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+    ]);
+
+    $data = $request->only(['nombre', 'nacionalidad', 'biografia']);
+
+    if ($request->hasFile('foto')) {
+        if ($autor->foto) {
+            Storage::disk('public')->delete($autor->foto);
+        }
+        $data['foto'] = $request->file('foto')->store('autores', 'public');
+    }
+
+    $autor->update($data);
+    return redirect()->route('estructuras.grafo')
+                     ->with('success', 'Autor actualizado correctamente.');
+}
 
     public function destroy(Autor $autor)
     {
@@ -78,7 +132,17 @@ class AutorController extends Controller
         }
 
         $autor->delete();
-        return redirect()->route('autores.index')
+        return redirect()->route('estructuras.grafo')
                          ->with('success', 'Autor eliminado correctamente.');
     }
+    public function eliminarAutor($id)
+{
+    $autor = Autor::find($id);
+    if ($autor->foto) {
+        Storage::disk('public')->delete($autor->foto);
+    }
+    $autor->delete();
+    return redirect()->route('estructuras.grafo')
+                     ->with('success', 'Autor eliminado correctamente.');
+}
 }

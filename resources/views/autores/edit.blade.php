@@ -4,8 +4,8 @@
     <div class="col-md-6">
         <div class="card-custom p-4">
             <h2 class="page-title mb-4">Editar Autor</h2>
-            <form action="{{ url('autores/'.$autor->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf @method('PATCH')
+            <form action="{{ url('autores/'.$autor->id.'/actualizar') }}" method="POST" enctype="multipart/form-data">
+                @csrf
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nombre</label>
                     <input type="text" name="nombre" value="{{ old('nombre', $autor->nombre) }}" class="form-control" required>

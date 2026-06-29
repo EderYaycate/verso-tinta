@@ -47,7 +47,12 @@
         transform: translateY(-4px);
         box-shadow: 0 8px 24px rgba(107,28,28,0.15);
     }
-    .libro-portada-az { width: 100%; height: 200px; object-fit: cover; }
+    .libro-portada-az {
+        width: 100%;
+        height: 200px;
+        object-fit: contain;
+        background: #f5f0e8;
+    }
     .libro-placeholder-az {
         width: 100%; height: 200px;
         background: linear-gradient(160deg, var(--vino-dark), var(--vino));
