@@ -16,12 +16,12 @@ class EstructuraController extends Controller
 {
     public function listaEnlazada()
     {
-        $lista = new ListaEnlazada();
+        $lista  = new ListaEnlazada();
         $libros = Libro::with(['autor', 'categoria'])->get();
 
         $i = 0;
         while ($i < count($libros)) {
-            $lista->insertar([
+            $lista->InsertarAlFinal([
                 'id'        => $libros[$i]->id,
                 'titulo'    => $libros[$i]->titulo,
                 'autor'     => $libros[$i]->autor->nombre,
@@ -37,12 +37,12 @@ class EstructuraController extends Controller
 
     public function pila()
     {
-        $pila = new Pila();
+        $pila   = new Pila();
         $libros = Libro::with('autor')->latest()->take(8)->get();
 
         $i = 0;
         while ($i < count($libros)) {
-            $pila->push([
+            $pila->Apilar([
                 'id'      => $libros[$i]->id,
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
@@ -57,12 +57,12 @@ class EstructuraController extends Controller
 
     public function cola()
     {
-        $cola = new Cola();
+        $cola   = new Cola();
         $libros = Libro::with('autor')->get();
 
         $i = 0;
         while ($i < count($libros)) {
-            $cola->encolar([
+            $cola->Encolar([
                 'id'      => $libros[$i]->id,
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
@@ -77,12 +77,12 @@ class EstructuraController extends Controller
 
     public function arbolBinario()
     {
-        $arbol = new ArbolBinario();
+        $arbol  = new ArbolBinario();
         $libros = Libro::with('autor')->get();
 
         $i = 0;
         while ($i < count($libros)) {
-            $arbol->insertar([
+            $arbol->AñadirNodo([
                 'id'      => $libros[$i]->id,
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
@@ -92,9 +92,9 @@ class EstructuraController extends Controller
             $i++;
         }
 
-        $inorden   = $arbol->inorden();
-        $preorden  = $arbol->preorden();
-        $postorden = $arbol->postorden();
+        $inorden   = $arbol->InOrden();
+        $preorden  = $arbol->PreOrden();
+        $postorden = $arbol->PostOrden();
 
         return view('estructuras.arbol-binario', compact('inorden', 'preorden', 'postorden'));
     }
@@ -105,8 +105,8 @@ class EstructuraController extends Controller
         $autores = Autor::with(['libros.categoria'])->get();
         $this->construirGrafo($grafo, $autores);
 
-        $vertices      = array_values($grafo->obtenerVertices());
-        $aristas       = $grafo->obtenerAristas();
+        $vertices      = array_values($grafo->ObtenerVertices());
+        $aristas       = $grafo->ObtenerAristas();
         $fotosAutores  = [];
         $idsAutores    = [];
         $librosAutores = [];
@@ -165,7 +165,7 @@ class EstructuraController extends Controller
             $datos  = $porFecha[$fecha];
             arsort($datos['libros']);
             $masVendido = count($datos['libros']) > 0 ? array_key_first($datos['libros']) : 'Sin datos';
-            $pila->push([
+            $pila->Apilar([
                 'fecha'       => $fecha,
                 'total'       => $datos['total'],
                 'pedidos'     => $datos['pedidos'],
@@ -198,7 +198,7 @@ class EstructuraController extends Controller
 
         $i = 0;
         while ($i < count($libros)) {
-            $lista->insertar([
+            $lista->InsertarAlFinal([
                 'id'        => $libros[$i]->id,
                 'titulo'    => $libros[$i]->titulo,
                 'autor'     => $libros[$i]->autor->nombre,
@@ -224,7 +224,7 @@ class EstructuraController extends Controller
 
         $i = 0;
         while ($i < count($libros)) {
-            $pila->push([
+            $pila->Apilar([
                 'id'      => $libros[$i]->id,
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
@@ -244,7 +244,7 @@ class EstructuraController extends Controller
 
         $i = 0;
         while ($i < count($libros)) {
-            $cola->encolar([
+            $cola->Encolar([
                 'id'      => $libros[$i]->id,
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
@@ -264,7 +264,7 @@ class EstructuraController extends Controller
 
         $i = 0;
         while ($i < count($libros)) {
-            $arbol->insertar([
+            $arbol->AñadirNodo([
                 'id'      => $libros[$i]->id,
                 'titulo'  => $libros[$i]->titulo,
                 'autor'   => $libros[$i]->autor->nombre,
@@ -278,9 +278,9 @@ class EstructuraController extends Controller
         $max = request('precio_max', 9999);
 
         if (request('precio_min') || request('precio_max')) {
-            $inorden = $arbol->buscarPorRango($min, $max);
+            $inorden = $arbol->BuscarPorRango($min, $max);
         } else {
-            $inorden = $arbol->inorden();
+            $inorden = $arbol->InOrden();
         }
 
         return view('usuario.arbol', compact('inorden'));
@@ -292,8 +292,8 @@ class EstructuraController extends Controller
         $autores = Autor::with(['libros.categoria'])->get();
         $this->construirGrafo($grafo, $autores);
 
-        $vertices      = array_values($grafo->obtenerVertices());
-        $aristas       = $grafo->obtenerAristas();
+        $vertices      = array_values($grafo->ObtenerVertices());
+        $aristas       = $grafo->ObtenerAristas();
         $fotosAutores  = [];
         $librosAutores = [];
 
@@ -319,7 +319,7 @@ class EstructuraController extends Controller
     {
         $i = 0;
         while ($i < count($autores)) {
-            $grafo->agregarVertice($autores[$i]->nombre);
+            $grafo->AgregarVertice($autores[$i]->nombre);
             $i++;
         }
 
@@ -360,7 +360,7 @@ class EstructuraController extends Controller
         }
 
         if ($catA[$k] === $catB[$l]) {
-            $grafo->agregarArista($nombreA, $nombreB, $catA[$k]);
+            $grafo->AgregarArista($nombreA, $nombreB, $catA[$k]);
         }
 
         $this->compararCategorias($grafo, $nombreA, $nombreB, $catA, $catB, $k, $l + 1);

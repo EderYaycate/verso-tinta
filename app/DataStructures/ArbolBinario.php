@@ -2,20 +2,6 @@
 
 namespace App\DataStructures;
 
-class NodoArbol
-{
-    public $dato;
-    public $izquierdo;
-    public $derecho;
-
-    public function __construct($dato)
-    {
-        $this->dato = $dato;
-        $this->izquierdo = null;
-        $this->derecho = null;
-    }
-}
-
 class ArbolBinario
 {
     private $raiz;
@@ -25,156 +11,165 @@ class ArbolBinario
         $this->raiz = null;
     }
 
-    public function insertar($dato)
+    private function CrearNodo($value)
     {
-        $this->raiz = $this->insertarNodo($this->raiz, $dato);
+        return (object)[
+            'value'         => $value,
+            'hijoIzquierdo' => null,
+            'hijoDerecho'   => null,
+        ];
     }
 
-    private function insertarNodo($nodo, $dato)
+    private function InsertarNodo($nodoActual, $value)
     {
-        if ($nodo === null) {
-            return new NodoArbol($dato);
+        if ($nodoActual === null) {
+            return $this->CrearNodo($value);
         }
 
-        if ($dato['titulo'] < $nodo->dato['titulo']) {
-            $nodo->izquierdo = $this->insertarNodo($nodo->izquierdo, $dato);
-        } elseif ($dato['titulo'] > $nodo->dato['titulo']) {
-            $nodo->derecho = $this->insertarNodo($nodo->derecho, $dato);
+        if ($value['titulo'] < $nodoActual->value['titulo']) {
+            $nodoActual->hijoIzquierdo = $this->InsertarNodo($nodoActual->hijoIzquierdo, $value);
+        } elseif ($value['titulo'] > $nodoActual->value['titulo']) {
+            $nodoActual->hijoDerecho = $this->InsertarNodo($nodoActual->hijoDerecho, $value);
         }
 
-        return $nodo;
+        return $nodoActual;
     }
 
-    public function buscar($titulo)
+    private function BuscarNodo($nodoActual, $titulo)
     {
-        return $this->buscarNodo($this->raiz, $titulo);
-    }
-
-    private function buscarNodo($nodo, $titulo)
-    {
-        if ($nodo === null) {
+        if ($nodoActual === null) {
             return null;
         }
 
-        if ($titulo === $nodo->dato['titulo']) {
-            return $nodo->dato;
+        if ($titulo === $nodoActual->value['titulo']) {
+            return $nodoActual->value;
         }
 
-        if ($titulo < $nodo->dato['titulo']) {
-            return $this->buscarNodo($nodo->izquierdo, $titulo);
+        if ($titulo < $nodoActual->value['titulo']) {
+            return $this->BuscarNodo($nodoActual->hijoIzquierdo, $titulo);
         }
 
-        return $this->buscarNodo($nodo->derecho, $titulo);
+        return $this->BuscarNodo($nodoActual->hijoDerecho, $titulo);
     }
 
-    public function eliminar($titulo)
+    private function BuscarMinimoNodo($nodoActual)
     {
-        $this->raiz = $this->eliminarNodo($this->raiz, $titulo);
+        if ($nodoActual->hijoIzquierdo === null) {
+            return $nodoActual;
+        }
+        return $this->BuscarMinimoNodo($nodoActual->hijoIzquierdo);
     }
 
-    private function eliminarNodo($nodo, $titulo)
+    private function EliminarNodo($nodoActual, $titulo)
     {
-        if ($nodo === null) {
+        if ($nodoActual === null) {
             return null;
         }
 
-        if ($titulo < $nodo->dato['titulo']) {
-            $nodo->izquierdo = $this->eliminarNodo($nodo->izquierdo, $titulo);
-        } elseif ($titulo > $nodo->dato['titulo']) {
-            $nodo->derecho = $this->eliminarNodo($nodo->derecho, $titulo);
+        if ($titulo < $nodoActual->value['titulo']) {
+            $nodoActual->hijoIzquierdo = $this->EliminarNodo($nodoActual->hijoIzquierdo, $titulo);
+        } elseif ($titulo > $nodoActual->value['titulo']) {
+            $nodoActual->hijoDerecho = $this->EliminarNodo($nodoActual->hijoDerecho, $titulo);
         } else {
-            if ($nodo->izquierdo === null) {
-                return $nodo->derecho;
+            if ($nodoActual->hijoIzquierdo === null) {
+                return $nodoActual->hijoDerecho;
             }
-            if ($nodo->derecho === null) {
-                return $nodo->izquierdo;
+            if ($nodoActual->hijoDerecho === null) {
+                return $nodoActual->hijoIzquierdo;
             }
 
-            $minimo = $this->minimoNodo($nodo->derecho);
-            $nodo->dato = $minimo->dato;
-            $nodo->derecho = $this->eliminarNodo($nodo->derecho, $minimo->dato['titulo']);
+            $minimo                  = $this->BuscarMinimoNodo($nodoActual->hijoDerecho);
+            $nodoActual->value       = $minimo->value;
+            $nodoActual->hijoDerecho = $this->EliminarNodo($nodoActual->hijoDerecho, $minimo->value['titulo']);
         }
 
-        return $nodo;
+        return $nodoActual;
     }
 
-    private function minimoNodo($nodo)
+    private function RecursiveInOrden($nodoActual, &$resultado)
     {
-        if ($nodo->izquierdo === null) {
-            return $nodo;
+        // IN-ORDEN: I - R - D
+        if ($nodoActual !== null) {
+            $this->RecursiveInOrden($nodoActual->hijoIzquierdo, $resultado);
+            $resultado[] = $nodoActual->value;
+            $this->RecursiveInOrden($nodoActual->hijoDerecho, $resultado);
         }
-        return $this->minimoNodo($nodo->izquierdo);
     }
 
-    public function inorden()
+    private function RecursivePreOrden($nodoActual, &$resultado)
     {
-        $resultado = [];
-        $this->inordenRecursivo($this->raiz, $resultado);
-        return $resultado;
-    }
-
-    private function inordenRecursivo($nodo, &$resultado)
-    {
-        if ($nodo === null) {
-            return;
+        // PRE-ORDEN: R - I - D
+        if ($nodoActual !== null) {
+            $resultado[] = $nodoActual->value;
+            $this->RecursivePreOrden($nodoActual->hijoIzquierdo, $resultado);
+            $this->RecursivePreOrden($nodoActual->hijoDerecho, $resultado);
         }
-        $this->inordenRecursivo($nodo->izquierdo, $resultado);
-        $resultado[] = $nodo->dato;
-        $this->inordenRecursivo($nodo->derecho, $resultado);
     }
 
-    public function preorden()
+    private function RecursivePostOrden($nodoActual, &$resultado)
     {
-        $resultado = [];
-        $this->preordenRecursivo($this->raiz, $resultado);
-        return $resultado;
-    }
-
-    private function preordenRecursivo($nodo, &$resultado)
-    {
-        if ($nodo === null) {
-            return;
+        // POST-ORDEN: I - D - R
+        if ($nodoActual !== null) {
+            $this->RecursivePostOrden($nodoActual->hijoIzquierdo, $resultado);
+            $this->RecursivePostOrden($nodoActual->hijoDerecho, $resultado);
+            $resultado[] = $nodoActual->value;
         }
-        $resultado[] = $nodo->dato;
-        $this->preordenRecursivo($nodo->izquierdo, $resultado);
-        $this->preordenRecursivo($nodo->derecho, $resultado);
     }
 
-    public function postorden()
+    private function BuscarRangoNodo($nodoActual, $min, $max, &$resultado)
     {
-        $resultado = [];
-        $this->postordenRecursivo($this->raiz, $resultado);
-        return $resultado;
-    }
-
-    private function postordenRecursivo($nodo, &$resultado)
-    {
-        if ($nodo === null) {
-            return;
-        }
-        $this->postordenRecursivo($nodo->izquierdo, $resultado);
-        $this->postordenRecursivo($nodo->derecho, $resultado);
-        $resultado[] = $nodo->dato;
-    }
-
-    public function buscarPorRango($min, $max)
-    {
-        $resultado = [];
-        $this->buscarRangoNodo($this->raiz, $min, $max, $resultado);
-        return $resultado;
-    }
-
-    private function buscarRangoNodo($nodo, $min, $max, &$resultado)
-    {
-        if ($nodo === null) {
+        if ($nodoActual === null) {
             return;
         }
 
-        if ($nodo->dato['precio'] >= $min && $nodo->dato['precio'] <= $max) {
-            $resultado[] = $nodo->dato;
+        if ($nodoActual->value['precio'] >= $min && $nodoActual->value['precio'] <= $max) {
+            $resultado[] = $nodoActual->value;
         }
 
-        $this->buscarRangoNodo($nodo->izquierdo, $min, $max, $resultado);
-        $this->buscarRangoNodo($nodo->derecho, $min, $max, $resultado);
+        $this->BuscarRangoNodo($nodoActual->hijoIzquierdo, $min, $max, $resultado);
+        $this->BuscarRangoNodo($nodoActual->hijoDerecho, $min, $max, $resultado);
+    }
+
+    public function AñadirNodo($value)
+    {
+        $this->raiz = $this->InsertarNodo($this->raiz, $value);
+    }
+
+    public function BuscarElemento($titulo)
+    {
+        return $this->BuscarNodo($this->raiz, $titulo);
+    }
+
+    public function EliminarElemento($titulo)
+    {
+        $this->raiz = $this->EliminarNodo($this->raiz, $titulo);
+    }
+
+    public function InOrden()
+    {
+        $resultado = [];
+        $this->RecursiveInOrden($this->raiz, $resultado);
+        return $resultado;
+    }
+
+    public function PreOrden()
+    {
+        $resultado = [];
+        $this->RecursivePreOrden($this->raiz, $resultado);
+        return $resultado;
+    }
+
+    public function PostOrden()
+    {
+        $resultado = [];
+        $this->RecursivePostOrden($this->raiz, $resultado);
+        return $resultado;
+    }
+
+    public function BuscarPorRango($min, $max)
+    {
+        $resultado = [];
+        $this->BuscarRangoNodo($this->raiz, $min, $max, $resultado);
+        return $resultado;
     }
 }

@@ -38,6 +38,15 @@
 <body>
 
 @php
+/**
+ * @var array  $librosCircular
+ * @var array  $librosData
+ * @var bool   $esUsuario
+ * @var bool   $esAdmin
+ * @var string $csrfToken
+ * @var string $carritoRuta
+ * @var string $loginRuta
+ */
     $librosHome = \App\Models\Libro::with(['autor','categoria'])->latest()->take(6)->get();
     $librosData = $librosHome->map(fn($l) => [
         'id'        => $l->id,
@@ -318,6 +327,7 @@
 <?php
 /**
  * @var array  $librosData
+ * @var array  $librosCircular
  * @var bool   $esUsuario
  * @var bool   $esAdmin
  * @var string $csrfToken

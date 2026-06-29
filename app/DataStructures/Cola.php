@@ -2,175 +2,104 @@
 
 namespace App\DataStructures;
 
-class NodoCola
-{
-    public $dato;
-    public $siguiente;
-
-    public function __construct($dato)
-    {
-        $this->dato = $dato;
-        $this->siguiente = null;
-    }
-}
-
 class Cola
 {
-    private $frente;
-    private $final;
-    private $tamanio;
+    private $head;
+    private $tail;
+    private $count;
 
     public function __construct()
     {
-        $this->frente = null;
-        $this->final = null;
-        $this->tamanio = 0;
+        $this->head  = null;
+        $this->tail  = null;
+        $this->count = 0;
     }
 
-    public function encolar($dato)
+    private function CrearNodo($value)
     {
-        $nuevo = new NodoCola($dato);
-        if ($this->estaVacia()) {
-            $this->frente = $nuevo;
-            $this->final = $nuevo;
+        return (object)[
+            'value' => $value,
+            'next'  => null,
+        ];
+    }
+
+    private function RecorrerNodo($nodoActual, &$elementos)
+    {
+        if ($nodoActual === null) {
+            return;
+        }
+        $elementos[] = $nodoActual->value;
+        $this->RecorrerNodo($nodoActual->next, $elementos);
+    }
+
+    public function Encolar($value)
+    {
+        $newNode = $this->CrearNodo($value);
+
+        if ($this->EstaVacia()) {
+            $this->head = $newNode;
+            $this->tail = $newNode;
         } else {
-            $this->final->siguiente = $nuevo;
-            $this->final = $nuevo;
+            $this->tail->next = $newNode;
+            $this->tail       = $newNode;
         }
-        $this->tamanio++;
+
+        $this->count++;
     }
 
-    public function desencolar()
+    public function Desencolar()
     {
-        if ($this->estaVacia()) {
+        if ($this->EstaVacia()) {
             return null;
         }
-        $dato = $this->frente->dato;
-        $this->frente = $this->frente->siguiente;
-        if ($this->frente === null) {
-            $this->final = null;
+
+        $value      = $this->head->value;
+        $this->head = $this->head->next;
+
+        if ($this->head === null) {
+            $this->tail = null;
         }
-        $this->tamanio--;
-        return $dato;
+
+        $this->count--;
+        return $value;
     }
 
-    public function frente()
+    public function ObtenerFrente()
     {
-        if ($this->estaVacia()) {
+        if ($this->EstaVacia()) {
             return null;
         }
-        return $this->frente->dato;
+        return $this->head->value;
+    }
+
+    public function ImprimirCola()
+    {
+        if ($this->head !== null) {
+            $nodoActual = $this->head;
+            while ($nodoActual !== null) {
+                echo $nodoActual->value . ' -> ';
+                $nodoActual = $nodoActual->next;
+            }
+            echo 'null' . PHP_EOL;
+        } else {
+            echo 'Cola vacía' . PHP_EOL;
+        }
+    }
+
+    public function EstaVacia()
+    {
+        return $this->head === null;
+    }
+
+    public function ObtenerCapacidad()
+    {
+        return $this->count;
     }
 
     public function recorrer()
     {
         $elementos = [];
-        $this->recorrerNodo($this->frente, $elementos);
+        $this->RecorrerNodo($this->head, $elementos);
         return $elementos;
-    }
-
-    private function recorrerNodo($nodo, &$elementos)
-    {
-        if ($nodo === null) {
-            return;
-        }
-        $elementos[] = $nodo->dato;
-        $this->recorrerNodo($nodo->siguiente, $elementos);
-    }
-
-    public function estaVacia()
-    {
-        return $this->frente === null;
-    }
-
-    public function tamanio()
-    {
-        return $this->tamanio;
-    }
-}
-
-class NodoColaPrioridad
-{
-    public $dato;
-    public $prioridad;
-    public $siguiente;
-
-    public function __construct($dato, $prioridad)
-    {
-        $this->dato      = $dato;
-        $this->prioridad = $prioridad;
-        $this->siguiente = null;
-    }
-}
-
-class ColaPrioridad
-{
-    private $frente;
-    private $tamanio;
-
-    public function __construct()
-    {
-        $this->frente  = null;
-        $this->tamanio = 0;
-    }
-
-    public function encolar($dato, $prioridad)
-    {
-        $nuevo = new NodoColaPrioridad($dato, $prioridad);
-
-        if ($this->frente === null || $prioridad > $this->frente->prioridad) {
-            $nuevo->siguiente = $this->frente;
-            $this->frente     = $nuevo;
-        } else {
-            $this->insertarOrdenado($this->frente, $nuevo);
-        }
-        $this->tamanio++;
-    }
-
-    private function insertarOrdenado($nodo, $nuevo)
-    {
-        if ($nodo->siguiente === null || $nuevo->prioridad > $nodo->siguiente->prioridad) {
-            $nuevo->siguiente = $nodo->siguiente;
-            $nodo->siguiente  = $nuevo;
-        } else {
-            $this->insertarOrdenado($nodo->siguiente, $nuevo);
-        }
-    }
-
-    public function desencolar()
-    {
-        if ($this->estaVacia()) {
-            return null;
-        }
-        $dato         = $this->frente->dato;
-        $this->frente = $this->frente->siguiente;
-        $this->tamanio--;
-        return $dato;
-    }
-
-    public function recorrer()
-    {
-        $elementos = [];
-        $this->recorrerNodo($this->frente, $elementos);
-        return $elementos;
-    }
-
-    private function recorrerNodo($nodo, &$elementos)
-    {
-        if ($nodo === null) {
-            return;
-        }
-        $elementos[] = $nodo->dato;
-        $this->recorrerNodo($nodo->siguiente, $elementos);
-    }
-
-    public function estaVacia()
-    {
-        return $this->frente === null;
-    }
-
-    public function tamanio()
-    {
-        return $this->tamanio;
     }
 }

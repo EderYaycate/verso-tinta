@@ -2,101 +2,137 @@
 
 namespace App\DataStructures;
 
-class Nodo
-{
-    public $dato;
-    public $siguiente;
-
-    public function __construct($dato)
-    {
-        $this->dato = $dato;
-        $this->siguiente = null;
-    }
-}
-
 class ListaEnlazada
 {
-    private $cabeza;
-    private $tamanio;
+    private $head;
+    private $count;
 
     public function __construct()
     {
-        $this->cabeza = null;
-        $this->tamanio = 0;
+        $this->head  = null;
+        $this->count = 0;
     }
 
-    public function insertar($dato)
+    private function CrearNodo($value)
     {
-        $nuevo = new Nodo($dato);
-        if ($this->cabeza === null) {
-            $this->cabeza = $nuevo;
-        } else {
-            $this->insertarAlFinal($this->cabeza, $nuevo);
+        return (object)[
+            'value' => $value,
+            'next'  => null,
+        ];
+    }
+
+    private function BuscarUltimoNodo($nodoActual)
+    {
+        if ($nodoActual->next === null) {
+            return $nodoActual;
         }
-        $this->tamanio++;
+        return $this->BuscarUltimoNodo($nodoActual->next);
     }
 
-    private function insertarAlFinal($nodo, $nuevo)
+    private function BuscarNodoPorId($nodoActual, $id)
     {
-        if ($nodo->siguiente === null) {
-            $nodo->siguiente = $nuevo;
+        if ($nodoActual === null) {
+            return null;
+        }
+        if ($nodoActual->value['id'] === $id) {
+            return $nodoActual->value;
+        }
+        return $this->BuscarNodoPorId($nodoActual->next, $id);
+    }
+
+    private function EliminarNodo($nodoActual, $id)
+    {
+        if ($nodoActual === null) {
+            return null;
+        }
+        if ($nodoActual->value['id'] === $id) {
+            return $nodoActual->next;
+        }
+        $nodoActual->next = $this->EliminarNodo($nodoActual->next, $id);
+        return $nodoActual;
+    }
+
+    private function RecorrerNodo($nodoActual, &$elementos)
+    {
+        if ($nodoActual === null) {
             return;
         }
-        $this->insertarAlFinal($nodo->siguiente, $nuevo);
+        $elementos[] = $nodoActual->value;
+        $this->RecorrerNodo($nodoActual->next, $elementos);
+    }
+
+    public function InsertarAlInicio($value)
+    {
+        $newNode       = $this->CrearNodo($value);
+        $newNode->next = $this->head;
+        $this->head    = $newNode;
+        $this->count++;
+    }
+
+    public function InsertarAlFinal($value)
+    {
+        $newNode = $this->CrearNodo($value);
+
+        if ($this->head === null) {
+            $this->head = $newNode;
+        } else {
+            $ultimoNodo       = $this->BuscarUltimoNodo($this->head);
+            $ultimoNodo->next = $newNode;
+        }
+
+        $this->count++;
+    }
+
+    public function BuscarElemento($id)
+    {
+        return $this->BuscarNodoPorId($this->head, $id);
+    }
+
+    public function EliminarElemento($id)
+    {
+        $this->head = $this->EliminarNodo($this->head, $id);
+        $this->count--;
+    }
+
+    public function ImprimirLista()
+    {
+        if ($this->head !== null) {
+            $nodoActual = $this->head;
+            while ($nodoActual !== null) {
+                echo $nodoActual->value['id'] . ' -> ';
+                $nodoActual = $nodoActual->next;
+            }
+            echo 'null' . PHP_EOL;
+        } else {
+            echo 'Lista vacía' . PHP_EOL;
+        }
+    }
+
+    // Alias para compatibilidad con el proyecto Laravel
+    public function insertar($dato)
+    {
+        $this->InsertarAlFinal($dato);
     }
 
     public function recorrer()
     {
         $elementos = [];
-        $this->recorrerNodo($this->cabeza, $elementos);
+        $this->RecorrerNodo($this->head, $elementos);
         return $elementos;
-    }
-
-    private function recorrerNodo($nodo, &$elementos)
-    {
-        if ($nodo === null) {
-            return;
-        }
-        $elementos[] = $nodo->dato;
-        $this->recorrerNodo($nodo->siguiente, $elementos);
     }
 
     public function buscar($id)
     {
-        return $this->buscarNodo($this->cabeza, $id);
-    }
-
-    private function buscarNodo($nodo, $id)
-    {
-        if ($nodo === null) {
-            return null;
-        }
-        if ($nodo->dato['id'] === $id) {
-            return $nodo->dato;
-        }
-        return $this->buscarNodo($nodo->siguiente, $id);
+        return $this->BuscarElemento($id);
     }
 
     public function eliminar($id)
     {
-        $this->cabeza = $this->eliminarNodo($this->cabeza, $id);
-        $this->tamanio--;
+        $this->EliminarElemento($id);
     }
 
-    private function eliminarNodo($nodo, $id)
+    public function ObtenerCapacidad()
     {
-        if ($nodo === null) {
-            return null;
-        }
-        if ($nodo->dato['id'] === $id) {
-            return $nodo->siguiente;
-        }
-        $nodo->siguiente = $this->eliminarNodo($nodo->siguiente, $id);
-        return $nodo;
-    }
-
-    public function tamanio()
-    {
-        return $this->tamanio;
+        return $this->count;
     }
 }

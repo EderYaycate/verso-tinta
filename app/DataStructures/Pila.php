@@ -2,79 +2,89 @@
 
 namespace App\DataStructures;
 
-class NodoPila
-{
-    public $dato;
-    public $siguiente;
-
-    public function __construct($dato)
-    {
-        $this->dato = $dato;
-        $this->siguiente = null;
-    }
-}
-
 class Pila
 {
-    private $tope;
-    private $tamanio;
+    private $top;
+    private $count;
 
     public function __construct()
     {
-        $this->tope = null;
-        $this->tamanio = 0;
+        $this->top   = null;
+        $this->count = 0;
     }
 
-    public function push($dato)
+    private function CrearNodo($value)
     {
-        $nuevo = new NodoPila($dato);
-        $nuevo->siguiente = $this->tope;
-        $this->tope = $nuevo;
-        $this->tamanio++;
+        return (object)[
+            'value' => $value,
+            'next'  => null,
+        ];
     }
 
-    public function pop()
+    private function RecorrerNodo($nodoActual, &$elementos)
     {
-        if ($this->estaVacia()) {
+        if ($nodoActual === null) {
+            return;
+        }
+        $elementos[] = $nodoActual->value;
+        $this->RecorrerNodo($nodoActual->next, $elementos);
+    }
+
+    public function Apilar($value)
+    {
+        $newNode       = $this->CrearNodo($value);
+        $newNode->next = $this->top;
+        $this->top     = $newNode;
+        $this->count++;
+    }
+
+    public function Desapilar()
+    {
+        if ($this->EstaVacia()) {
             return null;
         }
-        $dato = $this->tope->dato;
-        $this->tope = $this->tope->siguiente;
-        $this->tamanio--;
-        return $dato;
+        $value     = $this->top->value;
+        $this->top = $this->top->next;
+        $this->count--;
+        return $value;
     }
 
-    public function peek()
+    public function ObtenerTope()
     {
-        if ($this->estaVacia()) {
+        if ($this->EstaVacia()) {
             return null;
         }
-        return $this->tope->dato;
+        return $this->top->value;
+    }
+
+    public function ImprimirPila()
+    {
+        if ($this->top !== null) {
+            $nodoActual = $this->top;
+            while ($nodoActual !== null) {
+                echo $nodoActual->value . ' -> ';
+                $nodoActual = $nodoActual->next;
+            }
+            echo 'null' . PHP_EOL;
+        } else {
+            echo 'Pila vacía' . PHP_EOL;
+        }
+    }
+
+    public function EstaVacia()
+    {
+        return $this->top === null;
+    }
+
+    public function ObtenerCapacidad()
+    {
+        return $this->count;
     }
 
     public function recorrer()
     {
         $elementos = [];
-        $this->recorrerNodo($this->tope, $elementos);
+        $this->RecorrerNodo($this->top, $elementos);
         return $elementos;
-    }
-
-    private function recorrerNodo($nodo, &$elementos)
-    {
-        if ($nodo === null) {
-            return;
-        }
-        $elementos[] = $nodo->dato;
-        $this->recorrerNodo($nodo->siguiente, $elementos);
-    }
-
-    public function estaVacia()
-    {
-        return $this->tope === null;
-    }
-
-    public function tamanio()
-    {
-        return $this->tamanio;
     }
 }
